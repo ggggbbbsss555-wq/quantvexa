@@ -265,11 +265,14 @@ html,body{
 <!-- ===== Full-screen iframe container (no shell chrome) ===== -->
 <div class="page-container" id="pageContainer">
   <div class="frame-loader" id="frameLoader"><div class="spinner"></div></div>
-  <iframe class="page-frame" id="frame-dashboard" data-src="https://ggggbbbsss555-wq.github.io/qxbot/?embed=1"></iframe>
-  <iframe class="page-frame" id="frame-signals" data-src="https://ggggbbbsss555-wq.github.io/ERQQ/?embed=1"></iframe>
-  <iframe class="page-frame" id="frame-wallet" data-src="https://ggggbbbsss555-wq.github.io/Support/?embed=1"></iframe>
-  <iframe class="page-frame" id="frame-settings" data-src="https://ggggbbbsss555-wq.github.io/Support1/?embed=1"></iframe>
+  <iframe class="page-frame" id="frame-dashboard" data-base="https://ggggbbbsss555-wq.github.io/qxbot/"></iframe>
+  <iframe class="page-frame" id="frame-signals" data-base="https://ggggbbbsss555-wq.github.io/ERQQ/"></iframe>
+  <iframe class="page-frame" id="frame-wallet" data-base="https://ggggbbbsss555-wq.github.io/Support/"></iframe>
+  <iframe class="page-frame" id="frame-settings" data-base="https://ggggbbbsss555-wq.github.io/Support1/"></iframe>
 </div>
+
+<!-- Telegram Web App SDK -->
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
 <script>
 /* ===== State ===== */
@@ -277,8 +280,73 @@ var State = {
   platform: 'QUOTEX',
   currentPage: 'dashboard',
   loadedFrames: {},
-  appReady: false
+  appReady: false,
+  tgUser: null
 };
+
+/* ===== Telegram User Data ===== */
+function initTelegram(){
+  try{
+    if(window.Telegram && window.Telegram.WebApp){
+      Telegram.WebApp.ready();
+      Telegram.WebApp.expand();
+      var u = Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user;
+      if(u){
+        State.tgUser = {
+          id: u.id || '',
+          first_name: u.first_name || '',
+          last_name: u.last_name || '',
+          username: u.username || '',
+          photo_url: u.photo_url || '',
+          language_code: u.language_code || '',
+          full_name: ((u.first_name||'') + ' ' + (u.last_name||'')).trim() || (u.username || 'Trader')
+        };
+      }
+    }
+  }catch(e){console.warn('Telegram init error:',e);}
+
+  // Fallback: try URL params (for testing outside Telegram)
+  if(!State.tgUser){
+    var p = new URLSearchParams(location.search);
+    if(p.get('tg_id')){
+      State.tgUser = {
+        id: p.get('tg_id'),
+        first_name: p.get('tg_name') || 'Guest',
+        last_name: '',
+        username: p.get('tg_username') || 'guest',
+        photo_url: p.get('tg_photo') || '',
+        language_code: p.get('tg_lang') || 'en',
+        full_name: p.get('tg_name') || 'Guest User'
+      };
+    }
+  }
+
+  // Build iframe URLs with user data
+  if(State.tgUser){
+    var u = State.tgUser;
+    var params = 'embed=1'
+      + '&tg_id=' + encodeURIComponent(u.id)
+      + '&tg_name=' + encodeURIComponent(u.full_name)
+      + '&tg_first=' + encodeURIComponent(u.first_name)
+      + '&tg_last=' + encodeURIComponent(u.last_name)
+      + '&tg_username=' + encodeURIComponent(u.username)
+      + '&tg_photo=' + encodeURIComponent(u.photo_url)
+      + '&tg_lang=' + encodeURIComponent(u.language_code)
+      + '&tg_platform=' + encodeURIComponent(State.platform);
+    document.querySelectorAll('.page-frame').forEach(function(f){
+      var base = f.getAttribute('data-base');
+      f.setAttribute('data-src', base + '?' + params);
+    });
+  }else{
+    // No Telegram data — use embed mode only
+    document.querySelectorAll('.page-frame').forEach(function(f){
+      var base = f.getAttribute('data-base');
+      f.setAttribute('data-src', base + '?embed=1');
+    });
+  }
+}
+
+initTelegram();
 
 /* ===== Logo Intro Sequence ===== */
 (function(){
