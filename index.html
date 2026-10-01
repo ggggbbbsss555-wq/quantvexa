@@ -75,7 +75,7 @@ html,body{
 }
 @keyframes drawHex{to{stroke-dashoffset:0}}
 @keyframes growBar{from{transform:scaleY(0);opacity:0}to{transform:scaleY(1);opacity:1}}
-@keyframes revealHead{to{stroke-dashoffset:0}}
+@keyframes revealHead{to{stroke-dashoffset=0}}
 @media (max-width:600px){
   .logo-container{width:300px;height:300px}
   .logo-container.expanded{transform:translateY(20px) scale(1.6)}
@@ -155,60 +155,12 @@ html,body{
   .platform-btn-name{font-size:16px}
 }
 
-/* ===== Main App Shell ===== */
-.app-shell{
-  width:100%;height:100%;
-  display:flex;flex-direction:column;
-  opacity:0;
-  transition:opacity 0.5s ease;
-}
-.app-shell.visible{opacity:1}
-
-/* Top bar */
-.shell-topbar{
-  height:56px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:0 18px;
-  background:linear-gradient(180deg,#0d0d0d 0%,#000 100%);
-  border-bottom:1px solid #1f1f1f;
-  z-index:10;
-}
-.shell-brand{display:flex;align-items:center;gap:10px}
-.shell-brand-mark{
-  width:32px;height:32px;
-  border-radius:8px;
-  background:linear-gradient(135deg,rgba(0,210,255,0.15),rgba(0,153,204,0.05));
-  border:1px solid rgba(0,210,255,0.3);
-  display:flex;align-items:center;justify-content:center;
-}
-.shell-brand-mark svg{width:20px;height:20px}
-.shell-brand-name{
-  font-size:16px;font-weight:800;letter-spacing:0.3px;
-  background:linear-gradient(135deg,#fff 0%,#00d2ff 100%);
-  -webkit-background-clip:text;background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
-.shell-brand-sub{
-  font-size:9px;font-weight:600;color:#666;
-  letter-spacing:1.2px;text-transform:uppercase;
-  margin-top:2px;
-}
-.shell-platform-badge{
-  font-size:11px;
-  padding:5px 10px;
-  border-radius:6px;
-  background:rgba(0,210,255,0.1);
-  border:1px solid rgba(0,210,255,0.3);
-  color:#00d2ff;
-  letter-spacing:1px;
-  font-weight:700;
-}
-
-/* Page container (iframes) */
+/* ===== Full-screen iframe container ===== */
 .page-container{
-  flex:1;
-  position:relative;
-  overflow:hidden;
+  position:fixed;
+  inset:0;
+  z-index:1;
+  background:#000;
 }
 .page-frame{
   position:absolute;
@@ -224,51 +176,12 @@ html,body{
   pointer-events:auto;
 }
 
-/* Bottom navigation */
-.bottom-nav{
-  height:64px;flex-shrink:0;
-  display:flex;gap:0;
-  background:linear-gradient(180deg,#0d0d0d 0%,#000 100%);
-  border-top:1px solid #1f1f1f;
-  z-index:20;
-}
-.nav-item{
-  flex:1;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:4px;
-  background:transparent;border:none;
-  color:#888;cursor:pointer;
-  transition:color 0.2s ease;
-  position:relative;
-  font-family:inherit;
-}
-.nav-item:hover{color:#fff}
-.nav-item.active{color:#00d2ff}
-.nav-item.active::before{
-  content:'';position:absolute;top:0;left:50%;
-  transform:translateX(-50%);
-  width:40px;height:2px;
-  background:#00d2ff;
-  border-radius:2px;
-}
-.nav-item svg{
-  width:22px;height:22px;
-  stroke:currentColor;fill:none;stroke-width:2;
-  stroke-linecap:round;stroke-linejoin:round;
-  transition:transform 0.2s ease;
-}
-.nav-item.active svg{transform:scale(1.08)}
-.nav-item .nav-label{
-  font-size:10px;font-weight:700;
-  letter-spacing:0.5px;text-transform:uppercase;
-}
-
-/* Loading overlay for iframes */
+/* Loading overlay */
 .frame-loader{
-  position:absolute;inset:0;
+  position:fixed;inset:0;
   display:flex;align-items:center;justify-content:center;
   background:#000;
-  z-index:5;
+  z-index:100;
   opacity:0;
   pointer-events:none;
   transition:opacity 0.3s ease;
@@ -349,56 +262,13 @@ html,body{
   </div>
 </div>
 
-<!-- ===== Main App Shell ===== -->
-<div class="app-shell" id="appShell">
-
-  <!-- Top Bar -->
-  <div class="shell-topbar">
-    <div class="shell-brand">
-      <div class="shell-brand-mark">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2"/>
-          <line x1="12" y1="22" x2="12" y2="15.5"/>
-          <polyline points="22 8.5 12 15.5 2 8.5"/>
-        </svg>
-      </div>
-      <div>
-        <div class="shell-brand-name">QuantVexa</div>
-        <div class="shell-brand-sub">Control Center</div>
-      </div>
-    </div>
-    <div class="shell-platform-badge" id="shellPlatform">QUOTEX</div>
-  </div>
-
-  <!-- Page Container (iframes) -->
-  <div class="page-container" id="pageContainer">
-    <div class="frame-loader" id="frameLoader"><div class="spinner"></div></div>
-    <iframe class="page-frame" id="frame-dashboard" data-src="https://ggggbbbsss555-wq.github.io/qxbot/?embed=1"></iframe>
-    <iframe class="page-frame" id="frame-signals" data-src="https://ggggbbbsss555-wq.github.io/ERQQ/?embed=1"></iframe>
-    <iframe class="page-frame" id="frame-wallet" data-src="https://ggggbbbsss555-wq.github.io/Support/?embed=1"></iframe>
-    <iframe class="page-frame" id="frame-settings" data-src="https://ggggbbbsss555-wq.github.io/Support1/?embed=1"></iframe>
-  </div>
-
-  <!-- Bottom Navigation -->
-  <div class="bottom-nav">
-    <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')">
-      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-      <span class="nav-label">Dashboard</span>
-    </button>
-    <button class="nav-item" data-page="signals" onclick="showPage('signals')">
-      <svg viewBox="0 0 24 24"><line x1="5" y1="4" x2="5" y2="20" stroke-width="1.2"/><rect x="3.2" y="7" width="3.6" height="8" fill="#fff" stroke="none"/><line x1="12" y1="3" x2="12" y2="19" stroke-width="1.2"/><rect x="10.2" y="5" width="3.6" height="9" fill="#fff" stroke="none"/><line x1="19" y1="6" x2="19" y2="21" stroke-width="1.2"/><rect x="17.2" y="9" width="3.6" height="7" fill="#fff" stroke="none"/></svg>
-      <span class="nav-label">Signals</span>
-    </button>
-    <button class="nav-item" data-page="wallet" onclick="showPage('wallet')">
-      <svg viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
-      <span class="nav-label">Wallet</span>
-    </button>
-    <button class="nav-item" data-page="settings" onclick="showPage('settings')">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-      <span class="nav-label">Settings</span>
-    </button>
-  </div>
-
+<!-- ===== Full-screen iframe container (no shell chrome) ===== -->
+<div class="page-container" id="pageContainer">
+  <div class="frame-loader" id="frameLoader"><div class="spinner"></div></div>
+  <iframe class="page-frame" id="frame-dashboard" data-src="https://ggggbbbsss555-wq.github.io/qxbot/?embed=1"></iframe>
+  <iframe class="page-frame" id="frame-signals" data-src="https://ggggbbbsss555-wq.github.io/ERQQ/?embed=1"></iframe>
+  <iframe class="page-frame" id="frame-wallet" data-src="https://ggggbbbsss555-wq.github.io/Support/?embed=1"></iframe>
+  <iframe class="page-frame" id="frame-settings" data-src="https://ggggbbbsss555-wq.github.io/Support1/?embed=1"></iframe>
 </div>
 
 <script>
@@ -406,11 +276,20 @@ html,body{
 var State = {
   platform: 'QUOTEX',
   currentPage: 'dashboard',
-  loadedFrames: {}
+  loadedFrames: {},
+  appReady: false
 };
 
 /* ===== Logo Intro Sequence ===== */
 (function(){
+  // If URL has a hash, skip intro and platform selection entirely
+  var hash = location.hash.replace('#','');
+  if(hash && ['dashboard','signals','wallet','settings'].indexOf(hash) !== -1){
+    document.getElementById('logoScreen').classList.add('hidden');
+    State.appReady = true;
+    showPage(hash);
+    return;
+  }
   var logoScreen = document.getElementById('logoScreen');
   var logoContainer = document.getElementById('logoContainer');
   setTimeout(function(){
@@ -428,13 +307,11 @@ var State = {
 /* ===== Platform Selection ===== */
 function selectPlatform(name){
   State.platform = name;
-  document.getElementById('shellPlatform').textContent = name;
   var platformScreen = document.getElementById('platformScreen');
   platformScreen.classList.add('hidden');
   setTimeout(function(){
     platformScreen.classList.remove('visible');
-    document.getElementById('appShell').classList.add('visible');
-    // Load the default page (dashboard)
+    State.appReady = true;
     showPage('dashboard');
   }, 500);
 }
@@ -443,15 +320,10 @@ function selectPlatform(name){
 function showPage(page){
   State.currentPage = page;
 
-  // Update URL hash without triggering hashchange loop
+  // Update URL hash
   if(location.hash !== '#' + page){
     try{history.replaceState(null,'','#'+page);}catch(e){}
   }
-
-  // Update nav buttons
-  document.querySelectorAll('.nav-item').forEach(function(btn){
-    btn.classList.toggle('active', btn.getAttribute('data-page') === page);
-  });
 
   // Hide all frames
   document.querySelectorAll('.page-frame').forEach(function(f){
@@ -471,7 +343,6 @@ function showPage(page){
       loader.classList.remove('visible');
       State.loadedFrames[page] = true;
     });
-    // Fallback: hide loader after 8s even if load event doesn't fire
     setTimeout(function(){
       loader.classList.remove('visible');
     }, 8000);
@@ -480,16 +351,13 @@ function showPage(page){
   frame.classList.add('active');
 }
 
-/* ===== Hash-based routing on page load ===== */
+/* ===== Hash-based routing ===== */
 window.addEventListener('hashchange', function(){
   var page = location.hash.replace('#','') || 'dashboard';
   if(['dashboard','signals','wallet','settings'].indexOf(page) !== -1){
     showPage(page);
   }
 });
-
-/* ===== Handle initial hash (if user navigates directly to #signals etc.) ===== */
-// This runs after platform selection, handled in selectPlatform -> showPage
 </script>
 
 </body>
