@@ -1,0 +1,2725 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>QuantVexa — Control Center</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-600-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-800-normal.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+*,*::before,*::after{scrollbar-width:thin;scrollbar-color:rgba(140,140,140,0.4) transparent}
+*::-webkit-scrollbar{width:8px;height:8px;background:transparent}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:rgba(140,140,140,0.35);border-radius:10px;border:2px solid transparent;background-clip:padding-box}
+*::-webkit-scrollbar-thumb:hover{background:rgba(0,210,255,0.6);background-clip:padding-box}
+*::-webkit-scrollbar-button{display:none}
+
+html,body{
+  width:100%;height:100%;
+  background:#000;
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:#fff;overflow:hidden;
+}
+
+/* ===== Logo Intro Screen ===== */
+.logo-screen{
+  position:fixed;inset:0;z-index:1000;
+  background:#000;
+  display:flex;justify-content:center;align-items:center;
+  opacity:1;
+  transition:opacity 0.6s ease;
+}
+.logo-screen.hidden{opacity:0;pointer-events:none}
+.logo-container{
+  width:460px;height:460px;
+  position:relative;z-index:5;
+  transform-origin:center center;
+  transition:transform 3s cubic-bezier(0.22,1,0.36,1),
+             opacity 1.5s ease,
+             z-index 0.3s ease 2.5s;
+  display:none;
+  transform:translateY(20px);
+}
+.logo-container.shown{display:block}
+.logo-container.expanded{
+  transform:translateY(20px) scale(2.2);
+  opacity:0.25;z-index:0;pointer-events:none;
+}
+.logo-container svg{width:100%;height:100%;overflow:visible;display:block}
+.hexagon-border{
+  fill:none;stroke:url(#cyanGrad);
+  stroke-width:9;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:320;stroke-dashoffset:320;
+  animation:drawHex 3s ease-out forwards;
+}
+.hexagon{
+  fill:none;stroke:url(#blueGrad);
+  stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:320;stroke-dashoffset:320;
+  animation:drawHex 3s ease-out forwards;
+}
+.bar{
+  animation:growBar 2s ease-out forwards;
+  opacity:0;fill:#000;stroke:url(#cyanGrad);
+  stroke-width:2;stroke-linejoin:round;
+  transform-box:fill-box;transform-origin:center bottom;
+}
+.bar-2{stroke-width:3}
+.notch-fill{
+  fill:none;stroke:url(#cyanGrad);
+  stroke-width:9;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:38;stroke-dashoffset:38;
+  animation:revealHead 2s ease-out forwards;
+}
+.notch-fill-inner{
+  fill:none;stroke:url(#blueGrad);
+  stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+  stroke-dasharray:38;stroke-dashoffset:38;
+  animation:revealHead 2s ease-out forwards;
+}
+@keyframes drawHex{to{stroke-dashoffset:0}}
+@keyframes growBar{from{transform:scaleY(0);opacity:0}to{transform:scaleY(1);opacity:1}}
+@keyframes revealHead{to{stroke-dashoffset:0}}
+@media (max-width: 600px){
+  .logo-container{width:300px;height:300px}
+  .logo-container.expanded{transform:translateY(20px) scale(1.6)}
+}
+@media (max-width: 380px){
+  .logo-container{width:260px;height:260px}
+  .logo-container.expanded{transform:translateY(20px) scale(1.5)}
+}
+
+/* ===== Platform Selector Screen ===== */
+.platform-screen{
+  position:fixed;inset:0;z-index:900;
+  background:#000;
+  display:none;flex-direction:column;
+  justify-content:center;align-items:center;
+  padding:32px 20px;
+  opacity:0;
+  transition:opacity 0.5s ease;
+}
+.platform-screen.visible{display:flex;opacity:1}
+.platform-screen.hidden{opacity:0;pointer-events:none}
+.platform-screen-title{
+  font-size:11px;font-weight:700;color:#00d2ff;
+  letter-spacing:2.5px;text-transform:uppercase;
+  margin-bottom:8px;
+}
+.platform-screen-heading{
+  font-size:22px;font-weight:800;color:#fff;
+  margin-bottom:36px;text-align:center;
+  letter-spacing:0.3px;
+}
+.platform-buttons{
+  display:flex;flex-direction:column;gap:14px;
+  width:100%;max-width:360px;
+}
+.platform-btn{
+  padding:22px 20px;
+  background:linear-gradient(180deg,#131313 0%,#080808 100%);
+  border:1px solid #1f1f1f;
+  border-radius:14px;
+  cursor:pointer;
+  display:flex;align-items:center;gap:14px;
+  transition:border-color 0.22s ease,background 0.22s ease;
+  font-family:inherit;color:inherit;text-align:left;
+}
+.platform-btn:hover{
+  border-color:#00d2ff;
+  background:linear-gradient(180deg,rgba(0,210,255,0.06) 0%,#080808 100%);
+}
+.platform-btn-icon{
+  width:48px;height:48px;flex-shrink:0;
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#00d2ff 0%,#0099cc 100%);
+  border:1px solid #00d2ff;
+}
+.platform-btn-icon svg{width:26px;height:26px;stroke:#000;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.platform-btn-info{flex:1;min-width:0}
+.platform-btn-name{
+  font-size:18px;font-weight:800;color:#fff;
+  letter-spacing:0.5px;margin-bottom:2px;
+}
+.platform-btn-desc{
+  font-size:11px;color:#888;font-weight:500;
+  letter-spacing:0.2px;
+}
+.platform-btn-arrow{
+  color:#555;font-size:18px;font-weight:700;
+  transition:color 0.22s ease,transform 0.22s ease;
+}
+.platform-btn:hover .platform-btn-arrow{
+  color:#00d2ff;transform:translateX(3px);
+}
+
+/* ===== App Container ===== */
+.app{
+  width:100%;height:100%;
+  display:flex;flex-direction:column;
+  position:relative;
+  opacity:0;transition:opacity 0.5s ease;
+}
+.app.visible{opacity:1}
+
+/* ===== Top Bar ===== */
+.top-bar{
+  height:56px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;
+  background:linear-gradient(180deg,#0d0d0d 0%,#000 100%);
+  border-bottom:1px solid #1f1f1f;
+  z-index:10;
+}
+.brand{display:flex;align-items:center}
+.brand-text{display:flex;flex-direction:column;line-height:1}
+.brand-name{
+  font-size:16px;font-weight:800;letter-spacing:0.3px;
+  color:#fff;
+  background:linear-gradient(135deg,#fff 0%,#00d2ff 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.brand-sub{
+  font-size:9px;font-weight:600;color:#666;
+  letter-spacing:1.2px;text-transform:uppercase;
+  margin-top:2px;
+}
+.top-status{
+  display:flex;align-items:center;gap:8px;
+  padding:6px 12px;
+  background:rgba(10,10,10,0.6);
+  border:1px solid #1f1f1f;
+  border-radius:20px;
+  font-size:11px;font-weight:700;color:#888;
+  letter-spacing:0.3px;
+}
+.top-status .dot{width:7px;height:7px;border-radius:50%;background:#555}
+.top-status.online{border-color:rgba(0,255,136,0.3);color:#00ff88}
+.top-status.online .dot{background:#00ff88}
+.top-status.offline{border-color:rgba(255,68,102,0.3);color:#ff4466}
+.top-status.offline .dot{background:#ff4466}
+
+/* ===== Pages Container ===== */
+.pages{flex:1;overflow:hidden;position:relative}
+.page{
+  position:absolute;top:0;left:0;width:100%;height:100%;
+  overflow-y:auto;
+  padding:24px 20px 100px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.3s ease;
+}
+.page.active{opacity:1;pointer-events:auto}
+.page-inner{max-width:720px;margin:0 auto}
+
+/* ===== Section Titles ===== */
+.section-title{
+  font-size:12px;font-weight:700;
+  color:#888;letter-spacing:1.2px;
+  text-transform:uppercase;
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.section-title::before{
+  content:'';width:3px;height:14px;
+  background:linear-gradient(180deg,#00d2ff,#0099cc);
+  border-radius:2px;
+}
+
+/* ===== Cards ===== */
+.card{
+  background:linear-gradient(180deg,#131313 0%,#080808 100%);
+  border:1px solid #1f1f1f;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:16px;
+  transition:border-color 0.22s ease;
+}
+.card:hover{border-color:#2a2a2a}
+.card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:16px;
+}
+.card-title{
+  font-size:14px;font-weight:700;color:#fff;
+  display:flex;align-items:center;gap:10px;
+  letter-spacing:0.3px;
+}
+.card-title svg{width:18px;height:18px;stroke:#00d2ff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.card-badge{
+  padding:4px 10px;border-radius:12px;
+  font-size:10px;font-weight:700;
+  letter-spacing:0.5px;text-transform:uppercase;
+}
+.card-badge.connected{
+  background:rgba(0,255,136,0.1);
+  border:1px solid rgba(0,255,136,0.3);color:#00ff88;
+}
+.card-badge.disconnected{
+  background:rgba(255,68,102,0.1);
+  border:1px solid rgba(255,68,102,0.3);color:#ff4466;
+}
+
+/* ===== Form Fields ===== */
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field-label{
+  display:flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:700;color:#888;
+  letter-spacing:0.8px;text-transform:uppercase;
+  margin-bottom:8px;
+}
+.field-label svg{width:13px;height:13px;stroke:#00d2ff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.field-input{
+  width:100%;
+  padding:12px 14px;
+  background:rgba(10,10,10,0.6);
+  border:1px solid #1f1f1f;
+  border-radius:9px;
+  color:#fff;
+  font-family:inherit;font-size:13px;font-weight:500;
+  outline:none;
+  transition:border-color 0.2s ease,background 0.2s ease;
+}
+.field-input::placeholder{color:#555}
+.field-input:focus{border-color:#00d2ff;background:rgba(0,30,40,0.3)}
+.field-input[type="time"]::-webkit-calendar-picker-indicator,
+.field-input[type="number"]::-webkit-calendar-picker-indicator{
+  filter:invert(1) brightness(0.7);cursor:pointer;
+}
+.field-input[type="time"]{color-scheme:dark}
+
+/* ===== Time Stepper (custom local-time picker with small +/- buttons) ===== */
+.time-stepper{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:14px 12px;
+  background:rgba(10,10,10,0.6);
+  border:1px solid #1f1f1f;
+  border-radius:9px;
+  transition:border-color 0.2s ease,background 0.2s ease;
+  flex-wrap:nowrap;
+}
+.time-stepper:hover{border-color:#2a2a2a}
+.time-unit{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  flex:0 0 auto;
+}
+.time-btn{
+  width:26px;
+  height:26px;
+  background:rgba(0,210,255,0.08);
+  border:1px solid rgba(0,210,255,0.25);
+  border-radius:6px;
+  color:#00d2ff;
+  font-size:14px;
+  font-weight:800;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all 0.18s ease;
+  font-family:inherit;
+  line-height:1;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  padding:0;
+}
+.time-btn:hover{
+  background:rgba(0,210,255,0.2);
+  border-color:#00d2ff;
+  color:#fff;
+}
+.time-btn:active{
+  transform:scale(0.9);
+  background:linear-gradient(180deg,#00d2ff 0%,#0099cc 100%);
+  color:#000;
+  border-color:#00d2ff;
+}
+.time-value{
+  font-size:24px;
+  font-weight:800;
+  color:#fff;
+  font-variant-numeric:tabular-nums;
+  min-width:46px;
+  text-align:center;
+  padding:4px 4px;
+  letter-spacing:1px;
+  background:rgba(0,30,40,0.4);
+  border:1px solid rgba(0,210,255,0.15);
+  border-radius:7px;
+  line-height:1;
+}
+.time-separator{
+  font-size:24px;
+  font-weight:800;
+  color:#00d2ff;
+  align-self:center;
+  padding:0 2px;
+  line-height:1;
+}
+.time-tz{
+  font-size:10px;
+  color:#888;
+  font-weight:700;
+  letter-spacing:0.8px;
+  text-transform:uppercase;
+  margin-left:6px;
+  align-self:center;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  white-space:nowrap;
+}
+.time-tz svg{width:11px;height:11px;stroke:#00d2ff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.time-tz-name{
+  max-width:90px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  display:inline-block;
+  vertical-align:middle;
+}
+@media (max-width:480px){
+  .time-stepper{
+    padding:14px 10px;
+    gap:8px;
+    flex-wrap:nowrap;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .time-btn{
+    width:38px;
+    height:32px;
+    font-size:16px;
+    flex-shrink:0;
+  }
+  .time-value{
+    font-size:20px;
+    min-width:44px;
+    padding:6px 4px;
+    flex-shrink:0;
+  }
+  .time-separator{font-size:22px;flex-shrink:0}
+  .time-tz{
+    flex-shrink:1;
+    min-width:0;
+    font-size:9px;
+    overflow:hidden;
+  }
+  .time-tz-name{max-width:80px}
+}
+@media (max-width:360px){
+  .time-stepper{padding:10px 6px;gap:5px}
+  .time-btn{width:32px;height:28px;font-size:14px}
+  .time-value{font-size:17px;min-width:36px;padding:4px 2px}
+  .time-separator{font-size:17px}
+  .time-tz{font-size:8px}
+  .time-tz-name{max-width:60px}
+}
+.field-hint{
+  font-size:10px;color:#666;
+  margin-top:6px;letter-spacing:0.3px;
+  display:flex;align-items:center;gap:6px;
+}
+.field-hint svg{width:11px;height:11px;stroke:#666;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== Platform Fixed (Compact) ===== */
+.bot-type-fixed{
+  padding:10px 12px;
+  background:linear-gradient(180deg,rgba(0,136,204,0.08) 0%,rgba(0,136,204,0.02) 100%);
+  border:1px solid rgba(0,136,204,0.25);
+  border-radius:8px;
+  display:flex;align-items:center;gap:10px;
+  cursor:pointer;
+  transition:border-color 0.2s ease,background 0.2s ease;
+}
+.bot-type-fixed:hover{
+  border-color:#00d2ff;
+  background:linear-gradient(180deg,rgba(0,210,255,0.12) 0%,rgba(0,210,255,0.03) 100%);
+}
+.bot-type-fixed-change{
+  font-size:9px;font-weight:700;color:#00d2ff;
+  letter-spacing:0.5px;text-transform:uppercase;
+  padding:3px 8px;border-radius:8px;
+  background:rgba(0,210,255,0.1);
+  border:1px solid rgba(0,210,255,0.3);
+  flex-shrink:0;
+  transition:all 0.2s ease;
+}
+.bot-type-fixed:hover .bot-type-fixed-change{
+  background:rgba(0,210,255,0.2);
+}
+.bot-type-fixed-icon{
+  width:32px;height:32px;
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#00d2ff 0%,#0099cc 100%);
+  border:1px solid #00d2ff;
+  flex-shrink:0;
+}
+.bot-type-fixed-icon svg{width:18px;height:18px;stroke:#000;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.bot-type-fixed-info{flex:1;min-width:0}
+.bot-type-fixed-name{
+  font-size:13px;font-weight:700;color:#fff;
+  letter-spacing:0.3px;margin-bottom:1px;
+}
+.bot-type-fixed-desc{
+  font-size:10px;color:rgba(255,255,255,0.5);
+  letter-spacing:0.2px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.bot-type-fixed-check{
+  width:18px;height:18px;border-radius:50%;
+  background:#00d2ff;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.bot-type-fixed-check svg{width:10px;height:10px;stroke:#000;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== Strategy List (Vertical, Clickable) ===== */
+.strategy-list{
+  display:flex;flex-direction:column;gap:8px;
+}
+.strategy-list-item{
+  position:relative;
+  padding:14px;
+  background:linear-gradient(180deg,#161616 0%,#0a0a0a 100%);
+  border:1px solid #222;
+  border-radius:10px;
+  cursor:pointer;
+  transition:all 0.22s ease;
+  display:flex;align-items:center;gap:12px;
+  overflow:hidden;
+}
+.strategy-list-item:hover{
+  background:linear-gradient(180deg,#1f1f1f 0%,#131313 100%);
+  border-color:#333;
+}
+.strategy-list-item::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:3px;border-radius:0 2px 2px 0;
+  transition:opacity 0.22s ease;
+  opacity:0;
+}
+.strategy-list-item[data-strategy="strong"]::before{
+  background:linear-gradient(180deg,#00ff88,#00cc6a);
+}
+.strategy-list-item[data-strategy="medium"]::before{
+  background:linear-gradient(180deg,#00d2ff,#0099cc);
+}
+.strategy-list-item[data-strategy="pro"]::before{
+  background:linear-gradient(180deg,#ab82ff,#8a5ce0);
+}
+.strategy-list-item:hover::before{opacity:1}
+
+.strategy-list-icon{
+  width:42px;height:42px;flex-shrink:0;
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid;
+}
+.strategy-list-item[data-strategy="strong"] .strategy-list-icon{
+  background:rgba(0,255,136,0.12);
+  border-color:rgba(0,255,136,0.3);
+}
+.strategy-list-item[data-strategy="strong"] .strategy-list-icon svg{stroke:#00ff88}
+.strategy-list-item[data-strategy="medium"] .strategy-list-icon{
+  background:rgba(0,210,255,0.12);
+  border-color:rgba(0,210,255,0.3);
+}
+.strategy-list-item[data-strategy="medium"] .strategy-list-icon svg{stroke:#00d2ff}
+.strategy-list-item[data-strategy="pro"] .strategy-list-icon{
+  background:rgba(171,130,255,0.12);
+  border-color:rgba(171,130,255,0.3);
+}
+.strategy-list-item[data-strategy="pro"] .strategy-list-icon svg{stroke:#ab82ff}
+.strategy-list-icon svg{width:22px;height:22px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.strategy-list-info{flex:1;min-width:0}
+.strategy-list-name{
+  font-size:14px;font-weight:700;color:#fff;
+  letter-spacing:0.3px;margin-bottom:2px;
+}
+.strategy-list-desc{
+  font-size:11px;color:#888;font-weight:500;
+  letter-spacing:0.2px;
+}
+.strategy-list-arrow{
+  color:#555;font-size:18px;font-weight:700;
+  transition:color 0.22s ease,transform 0.22s ease;
+  flex-shrink:0;
+}
+.strategy-list-item:hover .strategy-list-arrow{
+  color:#00d2ff;transform:translateX(3px);
+}
+.strategy-list-item[data-strategy="strong"]:hover .strategy-list-arrow{color:#00ff88}
+.strategy-list-item[data-strategy="pro"]:hover .strategy-list-arrow{color:#ab82ff}
+
+/* ===== Run Button ===== */
+.run-btn{
+  width:100%;
+  padding:14px 20px;
+  background:linear-gradient(180deg,#00d2ff 0%,#0099cc 100%);
+  border:1px solid #00d2ff;
+  border-radius:10px;
+  color:#000;
+  font-family:inherit;font-size:14px;font-weight:800;
+  letter-spacing:0.5px;
+  cursor:pointer;
+  transition:all 0.22s ease;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  margin-top:8px;
+}
+.run-btn:hover{background:linear-gradient(180deg,#00deff 0%,#00a8e0 100%)}
+.run-btn:active{transform:scale(0.98)}
+.run-btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.run-btn .stop-icon{display:none}
+.run-btn.running{
+  background:linear-gradient(180deg,#ff4466 0%,#cc2a48 100%);
+  border-color:#ff4466;color:#fff;
+}
+.run-btn.running:hover{background:linear-gradient(180deg,#ff5577 0%,#d93055 100%)}
+.run-btn.running .play-icon{display:none}
+.run-btn.running .stop-icon{display:block}
+
+/* ===== Credits Card ===== */
+.credits-card{
+  background:linear-gradient(135deg,rgba(171,130,255,0.08) 0%,rgba(171,130,255,0.02) 100%);
+  border:1px solid rgba(171,130,255,0.25);
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:16px;
+}
+.credits-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;
+}
+.credits-title{
+  font-size:12px;font-weight:700;color:#ab82ff;
+  letter-spacing:0.8px;text-transform:uppercase;
+  display:flex;align-items:center;gap:8px;
+}
+.credits-title svg{width:16px;height:16px;stroke:#ab82ff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.credits-recharge{
+  padding:4px 10px;border-radius:12px;
+  background:rgba(171,130,255,0.1);
+  border:1px solid rgba(171,130,255,0.25);
+  color:#ab82ff;font-size:10px;font-weight:700;
+  cursor:pointer;transition:all 0.18s ease;
+  letter-spacing:0.3px;
+  font-family:inherit;
+}
+.credits-recharge:hover{background:rgba(171,130,255,0.18)}
+.credits-body{display:flex;align-items:center;gap:16px}
+.credits-circle{width:88px;height:88px;flex-shrink:0;position:relative}
+.credits-circle svg{width:100%;height:100%;transform:rotate(-90deg)}
+.credits-circle-bg{fill:none;stroke:rgba(171,130,255,0.15);stroke-width:6}
+.credits-circle-fg{
+  fill:none;stroke:#ab82ff;stroke-width:6;
+  stroke-linecap:round;
+  transition:stroke-dashoffset 1s ease;
+}
+.credits-circle-center{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+}
+.credits-circle-value{
+  font-size:22px;font-weight:800;color:#fff;
+  line-height:1;font-variant-numeric:tabular-nums;
+}
+.credits-circle-label{
+  font-size:8px;color:rgba(255,255,255,0.5);
+  text-transform:uppercase;letter-spacing:0.8px;
+  margin-top:4px;font-weight:700;
+}
+.credits-info{flex:1;min-width:0}
+.credits-info-row{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:6px 0;
+  border-bottom:1px solid rgba(171,130,255,0.08);
+  font-size:12px;
+}
+.credits-info-row:last-child{border-bottom:none}
+.credits-info-row .lbl{color:rgba(255,255,255,0.6);font-weight:500}
+.credits-info-row .val{color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
+.credits-info-row .val.positive{color:#00ff88}
+.credits-info-row .val.negative{color:#ff4466}
+
+/* ===== Credits Cost Per Bot (compact) ===== */
+.credits-cost-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:5px;
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid rgba(171,130,255,0.15);
+}
+.cost-chip{
+  padding:7px 4px;
+  background:rgba(10,10,10,0.6);
+  border:1px solid #1f1f1f;
+  border-radius:7px;
+  text-align:center;
+  transition:all 0.22s ease;
+  cursor:default;
+}
+.cost-chip.active{
+  background:linear-gradient(180deg,rgba(0,210,255,0.12) 0%,rgba(0,210,255,0.03) 100%);
+  border-color:#00d2ff;
+}
+.cost-chip[data-bot="strong"].active{
+  background:linear-gradient(180deg,rgba(0,255,136,0.12) 0%,rgba(0,255,136,0.03) 100%);
+  border-color:#00ff88;
+}
+.cost-chip[data-bot="pro"].active{
+  background:linear-gradient(180deg,rgba(171,130,255,0.12) 0%,rgba(171,130,255,0.03) 100%);
+  border-color:#ab82ff;
+}
+.cost-chip-name{
+  font-size:9px;
+  font-weight:700;
+  color:#888;
+  letter-spacing:0.4px;
+  text-transform:uppercase;
+  margin-bottom:3px;
+}
+.cost-chip.active[data-bot="strong"] .cost-chip-name{color:#00ff88}
+.cost-chip.active[data-bot="medium"] .cost-chip-name{color:#00d2ff}
+.cost-chip.active[data-bot="pro"] .cost-chip-name{color:#ab82ff}
+.cost-chip-value{
+  font-size:12px;
+  font-weight:800;
+  color:#fff;
+  font-variant-numeric:tabular-nums;
+  line-height:1;
+}
+.cost-chip-value small{
+  font-size:8px;
+  color:#888;
+  font-weight:600;
+  letter-spacing:0.2px;
+  display:block;
+  margin-top:2px;
+}
+.credits-notice{
+  margin-top:8px;
+  padding:7px 9px;
+  background:rgba(0,210,255,0.05);
+  border:1px solid rgba(0,210,255,0.18);
+  border-radius:7px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-size:9px;
+  color:rgba(255,255,255,0.7);
+  font-weight:600;
+  letter-spacing:0.2px;
+  line-height:1.4;
+}
+.credits-notice svg{width:10px;height:10px;stroke:#00d2ff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.credits-notice strong{color:#00d2ff;font-weight:700}
+.credits-daily-limit{
+  margin-top:6px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:7px 9px;
+  background:rgba(255,170,0,0.05);
+  border:1px solid rgba(255,170,0,0.2);
+  border-radius:7px;
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:0.3px;
+  text-transform:uppercase;
+}
+.credits-daily-limit .lbl{
+  display:flex;align-items:center;gap:5px;
+  color:rgba(255,255,255,0.6);
+}
+.credits-daily-limit .lbl svg{width:10px;height:10px;stroke:#ffaa00;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.credits-daily-limit .val{color:#ffaa00;font-size:11px;font-variant-numeric:tabular-nums}
+
+/* ===== Profile Page ===== */
+.profile-card{
+  background:linear-gradient(180deg,#131313 0%,#080808 100%);
+  border:1px solid #1f1f1f;
+  border-radius:14px;
+  padding:22px 18px 18px;
+  margin-bottom:16px;
+  position:relative;
+  overflow:hidden;
+}
+.profile-card::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:80px;
+  background:linear-gradient(180deg,rgba(0,210,255,0.18) 0%,rgba(0,210,255,0) 100%);
+  pointer-events:none;
+}
+.profile-header{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  position:relative;
+  z-index:1;
+}
+.profile-avatar{
+  width:72px;
+  height:72px;
+  flex-shrink:0;
+  border-radius:50%;
+  background:linear-gradient(135deg,#00d2ff 0%,#0099cc 100%);
+  border:2px solid #00d2ff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  font-weight:800;
+  color:#000;
+  letter-spacing:1px;
+  box-shadow:0 0 0 4px rgba(0,210,255,0.1);
+  position:relative;
+}
+.profile-avatar .status-dot{
+  position:absolute;
+  bottom:2px;right:2px;
+  width:14px;height:14px;
+  border-radius:50%;
+  background:#00ff88;
+  border:2px solid #080808;
+}
+.profile-info{flex:1;min-width:0}
+.profile-name{
+  font-size:18px;
+  font-weight:800;
+  color:#fff;
+  letter-spacing:0.3px;
+  margin-bottom:2px;
+  display:flex;align-items:center;gap:8px;
+  flex-wrap:wrap;
+}
+.profile-verified{
+  width:16px;height:16px;
+  background:#00d2ff;
+  border-radius:50%;
+  display:inline-flex;
+  align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.profile-verified svg{width:10px;height:10px;stroke:#000;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.profile-username{
+  font-size:12px;
+  color:#00d2ff;
+  font-weight:600;
+  letter-spacing:0.3px;
+  margin-bottom:6px;
+}
+.profile-meta{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+}
+.profile-badge{
+  font-size:9px;
+  font-weight:700;
+  padding:3px 8px;
+  border-radius:10px;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+}
+.profile-badge.id{background:rgba(255,255,255,0.06);border:1px solid #2a2a2a;color:#888}
+.profile-badge.id svg{width:10px;height:10px;stroke:#888;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.profile-badge.tier{background:rgba(171,130,255,0.1);border:1px solid rgba(171,130,255,0.3);color:#ab82ff}
+.profile-badge.tier svg{width:10px;height:10px;stroke:#ab82ff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.profile-winrate{
+  font-size:11px;
+  color:#888;
+  font-weight:600;
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid #1a1a1a;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+.profile-winrate .winrate-label{
+  display:flex;align-items:center;gap:6px;
+  letter-spacing:0.5px;
+  text-transform:uppercase;
+  font-size:10px;
+}
+.profile-winrate .winrate-label svg{width:12px;height:12px;stroke:#00ff88;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.profile-winrate .winrate-value{
+  font-size:18px;
+  font-weight:800;
+  color:#00ff88;
+  font-variant-numeric:tabular-nums;
+}
+
+/* Profile stats grid (4 cards) */
+.profile-stats{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+  margin-bottom:16px;
+}
+.pstat-card{
+  padding:14px 12px;
+  background:linear-gradient(180deg,#131313 0%,#080808 100%);
+  border:1px solid #1f1f1f;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  transition:border-color 0.22s ease;
+}
+.pstat-card:hover{border-color:#2a2a2a}
+.pstat-icon{
+  width:36px;height:36px;
+  flex-shrink:0;
+  border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:800;
+}
+.pstat-card.total .pstat-icon{background:rgba(0,240,255,0.12);color:#00f0ff}
+.pstat-card.wins .pstat-icon{background:rgba(0,255,136,0.12);color:#00ff88}
+.pstat-card.losses .pstat-icon{background:rgba(255,68,102,0.12);color:#ff4466}
+.pstat-card.rate .pstat-icon{background:rgba(171,130,255,0.12);color:#ab82ff}
+.pstat-info{flex:1;min-width:0}
+.pstat-value{
+  font-size:18px;
+  font-weight:800;
+  color:#fff;
+  line-height:1;
+  font-variant-numeric:tabular-nums;
+  margin-bottom:3px;
+}
+.pstat-card.wins .pstat-value{color:#00ff88}
+.pstat-card.losses .pstat-value{color:#ff4466}
+.pstat-card.rate .pstat-value{color:#ab82ff}
+.pstat-label{
+  font-size:9px;
+  color:#888;
+  font-weight:700;
+  letter-spacing:0.6px;
+  text-transform:uppercase;
+}
+
+/* Chart cards */
+.chart-card{
+  background:linear-gradient(180deg,#131313 0%,#080808 100%);
+  border:1px solid #1f1f1f;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:16px;
+  transition:border-color 0.22s ease;
+}
+.chart-card:hover{border-color:#2a2a2a}
+.chart-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:14px;
+  gap:10px;
+}
+.chart-title{
+  font-size:12px;
+  font-weight:700;
+  color:#fff;
+  letter-spacing:0.8px;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+.chart-title::before{
+  content:'';
+  width:3px;height:14px;
+  background:linear-gradient(180deg,#00d2ff,#0099cc);
+  border-radius:2px;
+}
+.chart-legend{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+.chart-legend-item{
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:10px;
+  color:#888;
+  font-weight:600;
+  letter-spacing:0.3px;
+}
+.chart-legend-dot{
+  width:8px;height:8px;
+  border-radius:2px;
+  flex-shrink:0;
+}
+.chart-canvas-wrap{
+  position:relative;
+  height:180px;
+  width:100%;
+}
+.chart-canvas-wrap.donut{
+  height:200px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.chart-donut-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid #1a1a1a;
+}
+.donut-stat{
+  text-align:center;
+}
+.donut-stat-value{
+  font-size:16px;
+  font-weight:800;
+  font-variant-numeric:tabular-nums;
+  line-height:1;
+  margin-bottom:4px;
+}
+.donut-stat-label{
+  font-size:9px;
+  color:#888;
+  font-weight:700;
+  letter-spacing:0.6px;
+  text-transform:uppercase;
+}
+.donut-stat.wins .donut-stat-value{color:#00ff88}
+.donut-stat.losses .donut-stat-value{color:#ff4466}
+.donut-stat.pending .donut-stat-value{color:#ffaa00}
+
+/* Recent wins list */
+.recent-wins-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.recent-win-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  background:rgba(10,10,10,0.6);
+  border:1px solid #1f1f1f;
+  border-right:3px solid #00ff88;
+  border-radius:9px;
+  transition:border-color 0.2s ease;
+  animation:slideIn 0.4s ease forwards;
+  opacity:0;transform:translateY(8px);
+}
+.recent-win-item:hover{border-color:#2a2a2a}
+.recent-win-icon{
+  width:32px;height:32px;
+  flex-shrink:0;
+  border-radius:8px;
+  background:rgba(0,255,136,0.1);
+  border:1px solid rgba(0,255,136,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;color:#00ff88;
+}
+.recent-win-info{flex:1;min-width:0}
+.recent-win-symbol{
+  font-size:12px;font-weight:700;color:#fff;
+  letter-spacing:0.3px;margin-bottom:2px;
+}
+.recent-win-meta{
+  font-size:10px;color:#888;font-weight:500;
+  letter-spacing:0.2px;
+}
+.recent-win-profit{
+  font-size:13px;font-weight:800;color:#00ff88;
+  font-variant-numeric:tabular-nums;
+  flex-shrink:0;
+}
+@media (max-width:480px){
+  .profile-avatar{width:60px;height:60px;font-size:20px}
+  .profile-name{font-size:16px}
+  .profile-stats{grid-template-columns:repeat(2,1fr);gap:6px}
+  .pstat-card{padding:12px 10px;gap:8px}
+  .pstat-icon{width:32px;height:32px;font-size:13px}
+  .pstat-value{font-size:16px}
+  .chart-canvas-wrap{height:160px}
+  .chart-canvas-wrap.donut{height:170px}
+  .donut-stat-value{font-size:14px}
+}
+
+/* ===== Stats Grid (legacy, kept for compatibility) ===== */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  margin-bottom:16px;
+}
+.stat-card{
+  padding:14px 10px;
+  background:linear-gradient(180deg,#131313 0%,#080808 100%);
+  border:1px solid #1f1f1f;
+  border-radius:10px;
+  text-align:center;
+}
+.stat-card-icon{
+  width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 8px;
+  font-size:13px;font-weight:800;
+}
+.stat-card.total .stat-card-icon{background:rgba(0,240,255,0.15);color:#00f0ff}
+.stat-card.win .stat-card-icon{background:rgba(0,255,136,0.15);color:#00ff88}
+.stat-card.loss .stat-card-icon{background:rgba(255,68,102,0.15);color:#ff4466}
+.stat-card-value{
+  font-size:20px;font-weight:800;color:#fff;
+  line-height:1;font-variant-numeric:tabular-nums;
+  margin-bottom:4px;
+}
+.stat-card-label{
+  font-size:10px;color:#888;font-weight:600;
+  letter-spacing:0.5px;text-transform:uppercase;
+}
+
+/* ===== History / Trades ===== */
+.filter-bar{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.filter-chip{
+  padding:6px 12px;
+  background:rgba(10,10,10,0.6);
+  border:1px solid #1f1f1f;
+  border-radius:20px;
+  color:#888;font-size:11px;font-weight:600;
+  cursor:pointer;transition:all 0.18s ease;
+  letter-spacing:0.3px;
+  font-family:inherit;
+}
+.filter-chip:hover{border-color:#333;color:#fff}
+.filter-chip.active{background:rgba(0,210,255,0.1);border-color:#00d2ff;color:#00d2ff}
+.trades-list{display:flex;flex-direction:column;gap:10px}
+.trade-card{
+  position:relative;
+  padding:14px;
+  background:linear-gradient(180deg,#131313 0%,#080808 100%);
+  border:1px solid #1f1f1f;
+  border-radius:12px;
+  transition:all 0.22s ease;
+  overflow:hidden;
+  animation:slideIn 0.4s ease forwards;
+  opacity:0;transform:translateY(8px);
+}
+@keyframes slideIn{to{opacity:1;transform:translateY(0)}}
+.trade-card:hover{border-color:#2a2a2a}
+.trade-card.win{border-right:3px solid #00ff88}
+.trade-card.loss{border-right:3px solid #ff4466}
+.trade-card.pending{border-right:3px solid #ffaa00}
+.trade-top{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:10px;gap:10px;
+}
+.trade-symbol{display:flex;align-items:center;gap:10px;min-width:0;flex:1}
+.trade-symbol-icon{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,210,255,0.1);
+  border:1px solid rgba(0,210,255,0.25);
+  font-size:10px;font-weight:800;color:#00d2ff;
+  flex-shrink:0;
+}
+.trade-symbol-info{min-width:0;flex:1}
+.trade-symbol-name{
+  font-size:13px;font-weight:700;color:#fff;
+  letter-spacing:0.3px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.trade-symbol-meta{
+  font-size:10px;color:#888;font-weight:500;
+  margin-top:2px;letter-spacing:0.2px;
+}
+.trade-type{
+  padding:4px 10px;border-radius:6px;
+  font-size:10px;font-weight:800;
+  letter-spacing:0.8px;text-transform:uppercase;
+  flex-shrink:0;
+}
+.trade-type.buy{background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.3);color:#00ff88}
+.trade-type.sell{background:rgba(255,68,102,0.1);border:1px solid rgba(255,68,102,0.3);color:#ff4466}
+.trade-details{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  padding:10px 0;
+  border-top:1px solid #1a1a1a;
+  border-bottom:1px solid #1a1a1a;
+  margin-bottom:10px;
+}
+.trade-detail{text-align:center}
+.trade-detail-label{
+  font-size:9px;color:#888;font-weight:600;
+  letter-spacing:0.6px;text-transform:uppercase;
+  margin-bottom:4px;
+}
+.trade-detail-value{
+  font-size:12px;color:#fff;font-weight:700;
+  font-variant-numeric:tabular-nums;
+}
+.trade-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.trade-result{
+  display:flex;align-items:center;gap:8px;
+  padding:5px 10px;border-radius:8px;
+  font-size:11px;font-weight:800;
+  letter-spacing:0.5px;text-transform:uppercase;
+}
+.trade-result.win{background:rgba(0,255,136,0.1);border:1px solid rgba(0,255,136,0.25);color:#00ff88}
+.trade-result.loss{background:rgba(255,68,102,0.1);border:1px solid rgba(255,68,102,0.25);color:#ff4466}
+.trade-result.pending{background:rgba(255,170,0,0.1);border:1px solid rgba(255,170,0,0.25);color:#ffaa00}
+.trade-result svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.trade-profit{font-size:13px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:0.3px}
+.trade-profit.positive{color:#00ff88}
+.trade-profit.negative{color:#ff4466}
+.trade-profit.neutral{color:#ffaa00}
+.empty-state{text-align:center;padding:60px 20px;color:#666;font-size:13px;letter-spacing:0.3px}
+.empty-state svg{width:48px;height:48px;stroke:#333;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin-bottom:14px}
+
+/* ===== Bottom Bar ===== */
+.bottom-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  height:64px;
+  display:flex;gap:0;
+  background:linear-gradient(180deg,#0d0d0d 0%,#000 100%);
+  border-top:1px solid #1f1f1f;
+  z-index:20;
+}
+.nav-btn{
+  flex:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:4px;
+  background:transparent;border:none;
+  color:#888;cursor:pointer;
+  transition:color 0.2s ease;
+  position:relative;
+  font-family:inherit;
+}
+.nav-btn:hover{color:#fff}
+.nav-btn.active{color:#00d2ff}
+.nav-btn.active::before{
+  content:'';position:absolute;top:0;left:50%;
+  transform:translateX(-50%);
+  width:40px;height:2px;
+  background:#00d2ff;
+  border-radius:2px;
+}
+.nav-btn svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.2s ease}
+.nav-btn.active svg{transform:scale(1.08)}
+.nav-btn .label{font-size:10px;font-weight:700;letter-spacing:0.5px;text-transform:uppercase}
+.nav-btn .badge{
+  position:absolute;top:10px;right:calc(50% - 22px);
+  min-width:16px;height:16px;padding:0 4px;
+  background:#ff4466;color:#fff;
+  font-size:9px;font-weight:800;
+  border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+}
+.nav-btn .badge.hidden{display:none}
+
+/* ===== Strategy Detail Page ===== */
+.detail-back{
+  background:transparent;
+  border:1px solid #1f1f1f;
+  border-radius:9px;
+  padding:8px 14px;
+  color:#888;
+  font-family:inherit;font-size:11px;font-weight:700;
+  letter-spacing:0.5px;text-transform:uppercase;
+  cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;
+  margin-bottom:14px;
+  transition:all 0.22s ease;
+}
+.detail-back:hover{border-color:#00d2ff;color:#00d2ff}
+.detail-back svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.detail-hero{
+  padding:28px 22px 22px;
+  background:linear-gradient(180deg,#131313 0%,#080808 100%);
+  border:1px solid #1f1f1f;
+  border-radius:14px;
+  margin-bottom:14px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.detail-hero::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:3px;
+}
+.detail-hero[data-strategy="strong"]::before{
+  background:linear-gradient(180deg,#00ff88,#00cc6a);
+}
+.detail-hero[data-strategy="medium"]::before{
+  background:linear-gradient(180deg,#00d2ff,#0099cc);
+}
+.detail-hero[data-strategy="pro"]::before{
+  background:linear-gradient(180deg,#ab82ff,#8a5ce0);
+}
+.detail-hero-icon{
+  width:64px;height:64px;
+  border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 14px;
+  border:1px solid;
+}
+.detail-hero[data-strategy="strong"] .detail-hero-icon{
+  background:linear-gradient(135deg,#00ff88 0%,#00cc6a 100%);
+  border-color:#00ff88;
+}
+.detail-hero[data-strategy="medium"] .detail-hero-icon{
+  background:linear-gradient(135deg,#00d2ff 0%,#0099cc 100%);
+  border-color:#00d2ff;
+}
+.detail-hero[data-strategy="pro"] .detail-hero-icon{
+  background:linear-gradient(135deg,#ab82ff 0%,#8a5ce0 100%);
+  border-color:#ab82ff;
+}
+.detail-hero-icon svg{width:32px;height:32px;stroke:#000;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.detail-hero-name{
+  font-size:24px;font-weight:800;color:#fff;
+  letter-spacing:0.5px;margin-bottom:6px;
+}
+.detail-hero-tag{
+  font-size:12px;color:#888;font-weight:600;
+  letter-spacing:0.5px;
+}
+
+.detail-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;
+  margin-bottom:14px;
+}
+.detail-stat{
+  padding:14px 10px;
+  background:linear-gradient(180deg,#131313 0%,#080808 100%);
+  border:1px solid #1f1f1f;
+  border-radius:10px;
+  text-align:center;
+}
+.detail-stat-value{
+  font-size:18px;font-weight:800;color:#fff;
+  line-height:1;font-variant-numeric:tabular-nums;
+  margin-bottom:4px;
+}
+.detail-page[data-strategy="strong"] .detail-stat-value{color:#00ff88}
+.detail-page[data-strategy="medium"] .detail-stat-value{color:#00d2ff}
+.detail-page[data-strategy="pro"] .detail-stat-value{color:#ab82ff}
+.detail-stat-label{
+  font-size:9px;color:#888;font-weight:600;
+  letter-spacing:0.6px;text-transform:uppercase;
+}
+
+.detail-features{
+  background:linear-gradient(180deg,#131313 0%,#080808 100%);
+  border:1px solid #1f1f1f;
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:14px;
+}
+.detail-features-title{
+  font-size:12px;font-weight:700;color:#888;
+  letter-spacing:1.2px;text-transform:uppercase;
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.detail-features-title::before{
+  content:'';width:3px;height:14px;
+  background:linear-gradient(180deg,#00d2ff,#0099cc);
+  border-radius:2px;
+}
+.detail-feature{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:10px 0;
+  border-bottom:1px solid #1a1a1a;
+}
+.detail-feature:last-child{border-bottom:none}
+.detail-feature-check{
+  width:18px;height:18px;flex-shrink:0;
+  border-radius:50%;
+  background:rgba(0,255,136,0.12);
+  border:1px solid rgba(0,255,136,0.3);
+  display:flex;align-items:center;justify-content:center;
+  margin-top:2px;
+}
+.detail-feature-check svg{width:10px;height:10px;stroke:#00ff88;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.detail-feature-text{
+  font-size:12px;color:#fff;font-weight:500;
+  line-height:1.5;flex:1;
+}
+.detail-feature-text strong{
+  color:#00d2ff;font-weight:700;
+}
+
+.detail-activate{
+  width:100%;
+  padding:14px 20px;
+  background:linear-gradient(180deg,#00d2ff 0%,#0099cc 100%);
+  border:1px solid #00d2ff;
+  border-radius:10px;
+  color:#000;
+  font-family:inherit;font-size:14px;font-weight:800;
+  letter-spacing:0.5px;
+  cursor:pointer;
+  transition:all 0.22s ease;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.detail-activate:hover{background:linear-gradient(180deg,#00deff 0%,#00a8e0 100%)}
+.detail-activate svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== Platform Selector Modal ===== */
+.platform-modal{
+  position:fixed;inset:0;z-index:1500;
+  background:rgba(0,0,0,0.85);
+  display:none;align-items:center;justify-content:center;
+  padding:20px;
+  opacity:0;transition:opacity 0.3s ease;
+  backdrop-filter:blur(4px);
+}
+.platform-modal.visible{display:flex;opacity:1}
+.platform-modal-box{
+  background:linear-gradient(180deg,#131313 0%,#080808 100%);
+  border:1px solid #1f1f1f;
+  border-radius:14px;
+  padding:24px 20px 20px;
+  max-width:340px;width:100%;
+}
+.platform-modal-title{
+  font-size:14px;font-weight:700;color:#fff;
+  letter-spacing:0.5px;
+  margin-bottom:6px;text-align:center;
+}
+.platform-modal-desc{
+  font-size:11px;color:#888;font-weight:500;
+  text-align:center;margin-bottom:18px;
+  letter-spacing:0.3px;
+}
+.platform-modal-options{
+  display:flex;flex-direction:column;gap:10px;
+}
+.platform-modal-option{
+  padding:16px 14px;
+  background:linear-gradient(180deg,#161616 0%,#0a0a0a 100%);
+  border:1px solid #222;
+  border-radius:10px;
+  cursor:pointer;
+  display:flex;align-items:center;gap:12px;
+  transition:all 0.22s ease;
+  font-family:inherit;color:inherit;text-align:left;
+}
+.platform-modal-option:hover{
+  border-color:#00d2ff;
+  background:linear-gradient(180deg,rgba(0,210,255,0.08) 0%,#0a0a0a 100%);
+}
+.platform-modal-option.selected{
+  border-color:#00d2ff;
+  background:linear-gradient(180deg,rgba(0,210,255,0.12) 0%,rgba(0,210,255,0.03) 100%);
+}
+.platform-modal-option-icon{
+  width:40px;height:40px;flex-shrink:0;
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#00d2ff 0%,#0099cc 100%);
+  border:1px solid #00d2ff;
+}
+.platform-modal-option-icon svg{width:22px;height:22px;stroke:#000;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.platform-modal-option-info{flex:1;min-width:0}
+.platform-modal-option-name{
+  font-size:15px;font-weight:800;color:#fff;
+  letter-spacing:0.5px;margin-bottom:2px;
+}
+.platform-modal-option-desc{
+  font-size:10px;color:#888;font-weight:500;
+}
+.platform-modal-option-check{
+  width:20px;height:20px;flex-shrink:0;
+  border-radius:50%;
+  background:#00d2ff;
+  display:none;align-items:center;justify-content:center;
+}
+.platform-modal-option.selected .platform-modal-option-check{display:flex}
+.platform-modal-option-check svg{width:12px;height:12px;stroke:#000;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+.platform-modal-close{
+  width:100%;margin-top:14px;
+  padding:10px;
+  background:transparent;
+  border:1px solid #1f1f1f;
+  border-radius:9px;
+  color:#888;
+  font-family:inherit;font-size:12px;font-weight:700;
+  letter-spacing:0.5px;text-transform:uppercase;
+  cursor:pointer;
+  transition:all 0.2s ease;
+}
+.platform-modal-close:hover{border-color:#333;color:#fff}
+
+/* ===== Toast ===== */
+.toast{
+  position:fixed;top:70px;left:50%;
+  transform:translateX(-50%) translateY(-20px);
+  padding:10px 18px;
+  background:rgba(0,40,20,0.95);
+  border:1px solid rgba(0,255,136,0.3);
+  border-radius:10px;
+  color:#00ff88;font-size:12px;font-weight:700;
+  letter-spacing:0.3px;
+  opacity:0;pointer-events:none;
+  transition:all 0.3s ease;
+  z-index:1100;
+  display:flex;align-items:center;gap:8px;
+}
+.toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.error{background:rgba(40,5,10,0.95);border-color:rgba(255,68,102,0.3);color:#ff4466}
+.toast svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== Responsive ===== */
+@media (max-width:480px){
+  .strategy-list-item{padding:12px}
+  .strategy-list-icon{width:38px;height:38px}
+  .strategy-list-icon svg{width:20px;height:20px}
+  .strategy-list-name{font-size:13px}
+  .strategy-list-desc{font-size:10px}
+  .stats-grid{grid-template-columns:repeat(3,1fr);gap:6px}
+  .stat-card{padding:12px 8px}
+  .stat-card-value{font-size:18px}
+  .credits-body{gap:12px}
+  .credits-circle{width:76px;height:76px}
+  .credits-circle-value{font-size:20px}
+  .brand-name{font-size:15px}
+  .bot-type-fixed{padding:9px 10px;gap:9px}
+  .bot-type-fixed-icon{width:30px;height:30px}
+  .bot-type-fixed-icon svg{width:16px;height:16px}
+  .bot-type-fixed-name{font-size:12px}
+  .bot-type-fixed-desc{font-size:9px}
+  .platform-btn{padding:18px 16px}
+  .platform-btn-icon{width:42px;height:42px}
+  .platform-btn-name{font-size:16px}
+  .detail-hero{padding:22px 18px 18px}
+  .detail-hero-icon{width:56px;height:56px}
+  .detail-hero-name{font-size:20px}
+  .detail-stat-value{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- =========================== Logo Intro Screen =========================== -->
+<div class="logo-screen" id="logoScreen">
+  <div class="logo-container" id="logoContainer">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#00d2ff"/>
+          <stop offset="40%" style="stop-color:#0099cc"/>
+          <stop offset="100%" style="stop-color:#00f0ff"/>
+        </linearGradient>
+        <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#09111f"/>
+          <stop offset="50%" style="stop-color:#000"/>
+          <stop offset="100%" style="stop-color:#070d18"/>
+        </linearGradient>
+        <clipPath id="hexagonClip">
+          <path d="M100 15 L160 50 L160 120 L100 155 L40 120 L40 50 Z"/>
+        </clipPath>
+      </defs>
+      <path d="M100 15 L160 50 L160 120 L100 155 L40 120 L40 50 Z" fill="#000"/>
+      <g clip-path="url(#hexagonClip)">
+        <rect class="bar bar-1" x="60" y="75" width="18" height="85" rx="2"/>
+        <rect class="bar bar-3" x="122" y="72" width="18" height="88" rx="2"/>
+        <path class="bar bar-2" d="M91 42 L91 160 L109 160 L109 42 Z"/>
+      </g>
+      <path class="hexagon-border" d="M100 155 L40 120 L40 50 L57.1 40 M100 155 L160 120 L160 50 L142.9 40"/>
+      <path class="hexagon" d="M100 155 L40 120 L40 50 L57.1 40 M100 155 L160 120 L160 50 L142.9 40"/>
+      <path class="notch-fill" d="M100 14.8 L67 32.25"/>
+      <path class="notch-fill" d="M100 14.8 L133 32.25"/>
+      <path class="notch-fill-inner" d="M100 14.8 L67 32.25"/>
+      <path class="notch-fill-inner" d="M100 14.8 L133 32.25"/>
+    </svg>
+  </div>
+</div>
+
+<!-- =========================== Platform Selector Screen =========================== -->
+<div class="platform-screen" id="platformScreen">
+  <div class="platform-screen-title">QuantVexa</div>
+  <h1 class="platform-screen-heading">Select Trading Platform</h1>
+  <div class="platform-buttons">
+    <button class="platform-btn" onclick="selectPlatform('QUOTEX')">
+      <div class="platform-btn-icon">
+        <svg viewBox="0 0 24 24">
+          <line x1="7" y1="3" x2="7" y2="21"/>
+          <rect x="4" y="7" width="6" height="9" fill="#000" fill-opacity="0.15"/>
+          <line x1="17" y1="2" x2="17" y2="22"/>
+          <rect x="14" y="10" width="6" height="7" fill="#000" fill-opacity="0.15"/>
+        </svg>
+      </div>
+      <div class="platform-btn-info">
+        <div class="platform-btn-name">QUOTEX</div>
+        <div class="platform-btn-desc">Binary options trading</div>
+      </div>
+      <div class="platform-btn-arrow">›</div>
+    </button>
+    <button class="platform-btn" onclick="selectPlatform('BINOLLA')">
+      <div class="platform-btn-icon">
+        <svg viewBox="0 0 24 24">
+          <polyline points="3 17 9 11 13 15 21 7"/>
+          <polyline points="14 7 21 7 21 14"/>
+        </svg>
+      </div>
+      <div class="platform-btn-info">
+        <div class="platform-btn-name">BINOLLA</div>
+        <div class="platform-btn-desc">Smart advanced trading</div>
+      </div>
+      <div class="platform-btn-arrow">›</div>
+    </button>
+  </div>
+</div>
+
+<!-- =========================== Main App =========================== -->
+<div class="app" id="mainApp">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="brand">
+      <div class="brand-text">
+        <div class="brand-name">QuantVexa</div>
+        <div class="brand-sub">Control Center</div>
+      </div>
+    </div>
+    <div class="top-status offline" id="topStatus">
+      <span class="dot"></span>
+      <span id="topStatusText">Offline</span>
+    </div>
+  </div>
+
+  <!-- Pages -->
+  <div class="pages">
+
+    <!-- ===== Home Page ===== -->
+    <div class="page active" id="homePage">
+      <div class="page-inner">
+
+        <!-- Credits Card -->
+        <div class="credits-card">
+          <div class="credits-header">
+            <div class="credits-title">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>Credits Balance</span>
+            </div>
+            <button class="credits-recharge" onclick="showToast('Recharge window opened','success')">+ Top Up</button>
+          </div>
+          <div class="credits-body">
+            <div class="credits-circle">
+              <svg viewBox="0 0 100 100">
+                <circle class="credits-circle-bg" cx="50" cy="50" r="42"/>
+                <circle class="credits-circle-fg" id="creditsCircle" cx="50" cy="50" r="42" stroke-dasharray="263.9" stroke-dashoffset="0" style="stroke-dashoffset:0"/>
+              </svg>
+              <div class="credits-circle-center">
+                <div class="credits-circle-value" id="creditsValue">900</div>
+                <div class="credits-circle-label">Points</div>
+              </div>
+            </div>
+            <div class="credits-info">
+              <div class="credits-info-row">
+                <span class="lbl">Cost per signal</span>
+                <span class="val" id="costPerSignal">1 pt</span>
+              </div>
+              <div class="credits-info-row">
+                <span class="lbl">Signals remaining</span>
+                <span class="val positive" id="remainingSignals">900</span>
+              </div>
+              <div class="credits-info-row">
+                <span class="lbl">Auto-renewal</span>
+                <span class="val">In 30 days</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cost Per Bot Grid -->
+          <div class="credits-cost-grid">
+            <div class="cost-chip active" data-bot="strong" id="costChipStrong">
+              <div class="cost-chip-name">Strong</div>
+              <div class="cost-chip-value">1<small> pt/signal</small></div>
+            </div>
+            <div class="cost-chip" data-bot="medium" id="costChipMedium">
+              <div class="cost-chip-name">Medium</div>
+              <div class="cost-chip-value">3<small> pt/signal</small></div>
+            </div>
+            <div class="cost-chip" data-bot="pro" id="costChipPro">
+              <div class="cost-chip-name">Pro</div>
+              <div class="cost-chip-value">6<small> pt/signal</small></div>
+            </div>
+          </div>
+
+          <!-- Notice: 1 signal = 1 point = 900 monthly -->
+          <div class="credits-notice">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <span><strong>1 signal = 1 point</strong> — up to <strong>900 signals monthly</strong> (with Strong bot)</span>
+          </div>
+
+          <!-- Daily Limit -->
+          <div class="credits-daily-limit">
+            <span class="lbl">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Max Daily Signals
+            </span>
+            <span class="val">50 / day</span>
+          </div>
+        </div>
+
+        <!-- Bot Settings Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Bot Settings</span>
+            </div>
+            <span class="card-badge disconnected" id="connectionBadge">Offline</span>
+          </div>
+
+          <!-- Platform -->
+          <div class="field">
+            <div class="field-label">
+              <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+              <span>Platform</span>
+            </div>
+            <div class="bot-type-fixed" onclick="openPlatformModal()">
+              <div class="bot-type-fixed-icon">
+                <svg viewBox="0 0 24 24"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+              </div>
+              <div class="bot-type-fixed-info">
+                <div class="bot-type-fixed-name" id="platformName">QUOTEX</div>
+                <div class="bot-type-fixed-desc">Tap to change platform</div>
+              </div>
+              <div class="bot-type-fixed-change">Change</div>
+            </div>
+          </div>
+
+          <!-- Strategy List (Clickable, opens detail page) -->
+          <div class="field">
+            <div class="field-label">
+              <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span>Signal Strategy</span>
+            </div>
+            <div class="strategy-list">
+              <div class="strategy-list-item" data-strategy="strong" onclick="openStrategyDetail('strong')">
+                <div class="strategy-list-icon">
+                  <svg viewBox="0 0 24 24">
+                    <line x1="6" y1="3" x2="6" y2="21"/>
+                    <rect x="4" y="7" width="4" height="8" fill="currentColor" fill-opacity="0.2"/>
+                    <line x1="13" y1="5" x2="13" y2="19"/>
+                    <rect x="11" y="9" width="4" height="6" fill="currentColor" fill-opacity="0.2"/>
+                    <line x1="19" y1="4" x2="19" y2="20"/>
+                    <rect x="17" y="8" width="4" height="7" fill="currentColor" fill-opacity="0.2"/>
+                  </svg>
+                </div>
+                <div class="strategy-list-info">
+                  <div class="strategy-list-name">Strong</div>
+                  <div class="strategy-list-desc">High frequency, moderate accuracy</div>
+                </div>
+                <div class="strategy-list-arrow">›</div>
+              </div>
+              <div class="strategy-list-item" data-strategy="medium" onclick="openStrategyDetail('medium')">
+                <div class="strategy-list-icon">
+                  <svg viewBox="0 0 24 24">
+                    <line x1="3" y1="12" x2="21" y2="12"/>
+                    <polyline points="3 6 9 12 13 8 21 14"/>
+                    <circle cx="13" cy="8" r="1.5" fill="currentColor"/>
+                  </svg>
+                </div>
+                <div class="strategy-list-info">
+                  <div class="strategy-list-name">Medium</div>
+                  <div class="strategy-list-desc">Balanced signals, steady results</div>
+                </div>
+                <div class="strategy-list-arrow">›</div>
+              </div>
+              <div class="strategy-list-item" data-strategy="pro" onclick="openStrategyDetail('pro')">
+                <div class="strategy-list-icon">
+                  <svg viewBox="0 0 24 24">
+                    <polygon points="12 2 22 12 12 22 2 12"/>
+                    <polyline points="7 12 10 9 14 13 17 10"/>
+                  </svg>
+                </div>
+                <div class="strategy-list-info">
+                  <div class="strategy-list-name">Pro</div>
+                  <div class="strategy-list-desc">Premium accuracy, low frequency</div>
+                </div>
+                <div class="strategy-list-arrow">›</div>
+              </div>
+            </div>
+            <div class="field-hint">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>Tap any strategy to view full details</span>
+            </div>
+          </div>
+
+          <!-- Chat ID Field -->
+          <div class="field">
+            <div class="field-label">
+              <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Chat ID</span>
+            </div>
+            <input type="text" class="field-input" id="chatIdInput" placeholder="-1001234567890" autocomplete="off"/>
+            <div class="field-hint">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>Bot must be admin in the channel to send signals</span>
+            </div>
+          </div>
+
+          <!-- Session Time Field (Custom Local-Time Stepper) -->
+          <div class="field">
+            <div class="field-label">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span>Session Time</span>
+            </div>
+            <div class="time-stepper">
+              <div class="time-unit">
+                <button class="time-btn" type="button" onclick="adjustSessionTime('hour',1)" aria-label="Increment hour">+</button>
+                <div class="time-value" id="sessionHour">00</div>
+                <button class="time-btn" type="button" onclick="adjustSessionTime('hour',-1)" aria-label="Decrement hour">−</button>
+              </div>
+              <div class="time-separator">:</div>
+              <div class="time-unit">
+                <button class="time-btn" type="button" onclick="adjustSessionTime('minute',1)" aria-label="Increment minute">+</button>
+                <div class="time-value" id="sessionMinute">00</div>
+                <button class="time-btn" type="button" onclick="adjustSessionTime('minute',-1)" aria-label="Decrement minute">−</button>
+              </div>
+              <div class="time-tz" id="sessionTz">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <span class="time-tz-name" id="sessionTzName">Local</span>
+              </div>
+            </div>
+            <div class="field-hint">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>Auto-detected from your device — session starts daily at this local time</span>
+            </div>
+          </div>
+
+          <!-- Number of Signals Field -->
+          <div class="field">
+            <div class="field-label">
+              <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span>Number of Signals</span>
+            </div>
+            <input type="number" class="field-input" id="signalsCountInput" placeholder="10" min="1" max="500" value="10"/>
+            <div class="field-hint">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>Total signals to send in this session</span>
+            </div>
+          </div>
+
+          <!-- Run Button -->
+          <button class="run-btn" id="runBtn" onclick="toggleSession()">
+            <svg class="play-icon" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            <svg class="stop-icon" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+            <span id="runBtnText">Start Session</span>
+          </button>
+        </div>
+
+        <!-- Session Info -->
+        <div class="card" id="sessionCard" style="display:none">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span>Session Info</span>
+            </div>
+          </div>
+          <div class="credits-info">
+            <div class="credits-info-row">
+              <span class="lbl">Strategy</span>
+              <span class="val" id="sessionStrategy">—</span>
+            </div>
+            <div class="credits-info-row">
+              <span class="lbl">Scheduled time</span>
+              <span class="val" id="sessionTime">--:--</span>
+            </div>
+            <div class="credits-info-row">
+              <span class="lbl">Started at</span>
+              <span class="val" id="sessionStart">--:--</span>
+            </div>
+            <div class="credits-info-row">
+              <span class="lbl">Signals sent</span>
+              <span class="val" id="sessionSignals">0 / 0</span>
+            </div>
+            <div class="credits-info-row">
+              <span class="lbl">Status</span>
+              <span class="val positive" id="sessionStatus">Waiting</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ===== Strategy Detail Page ===== -->
+    <div class="page" id="strategyDetailPage">
+      <div class="page-inner">
+        <button class="detail-back" onclick="navigateTo('home')">
+          <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          <span>Back</span>
+        </button>
+        <div id="strategyDetailContent"></div>
+      </div>
+    </div>
+
+    <!-- ===== Profile Page ===== -->
+    <div class="page" id="historyPage">
+      <div class="page-inner">
+
+        <!-- Profile Header -->
+        <div class="profile-card">
+          <div class="profile-header">
+            <div class="profile-avatar" id="profileAvatar">
+              <span id="profileAvatarText">QX</span>
+              <img id="profileAvatarImg" src="" alt="" style="display:none;width:100%;height:100%;border-radius:50%;object-fit:cover"/>
+              <span class="status-dot"></span>
+            </div>
+            <div class="profile-info">
+              <div class="profile-name">
+                <span id="profileName">QuantVexa Trader</span>
+                <span class="profile-verified" title="Verified">
+                  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+              </div>
+              <div class="profile-username" id="profileUsername">@quantvexa_pro</div>
+              <div class="profile-meta">
+                <span class="profile-badge id">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
+                  ID: <span id="profileId">8472913</span>
+                </span>
+                <span class="profile-badge tier">
+                  <svg viewBox="0 0 24 24"><polygon points="12 2 22 12 12 22 2 12"/></svg>
+                  Pro Tier
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="profile-winrate">
+            <span class="winrate-label">
+              <svg viewBox="0 0 24 24"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+              Overall Win Rate
+            </span>
+            <span class="winrate-value" id="profileWinRate">0%</span>
+          </div>
+        </div>
+
+        <!-- Profile Stats (2x2 grid) -->
+        <div class="profile-stats">
+          <div class="pstat-card total">
+            <div class="pstat-icon">Σ</div>
+            <div class="pstat-info">
+              <div class="pstat-value" id="pstatTotal">0</div>
+              <div class="pstat-label">Total Signals</div>
+            </div>
+          </div>
+          <div class="pstat-card wins">
+            <div class="pstat-icon">✓</div>
+            <div class="pstat-info">
+              <div class="pstat-value" id="pstatWins">0</div>
+              <div class="pstat-label">Successful</div>
+            </div>
+          </div>
+          <div class="pstat-card losses">
+            <div class="pstat-icon">✗</div>
+            <div class="pstat-info">
+              <div class="pstat-value" id="pstatLosses">0</div>
+              <div class="pstat-label">Failed</div>
+            </div>
+          </div>
+          <div class="pstat-card rate">
+            <div class="pstat-icon">%</div>
+            <div class="pstat-info">
+              <div class="pstat-value" id="pstatRate">0%</div>
+              <div class="pstat-label">Success Rate</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart 1: Win Rate Over Time (Line Chart) -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Win Rate Over Time</div>
+            <div class="chart-legend">
+              <span class="chart-legend-item"><span class="chart-legend-dot" style="background:#00d2ff"></span>Win Rate %</span>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="winRateChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Signal Distribution (Doughnut Chart) -->
+        <div class="chart-card">
+          <div class="chart-header">
+            <div class="chart-title">Signal Distribution</div>
+          </div>
+          <div class="chart-canvas-wrap donut">
+            <canvas id="donutChart"></canvas>
+          </div>
+          <div class="chart-donut-stats">
+            <div class="donut-stat wins">
+              <div class="donut-stat-value" id="donutWins">0</div>
+              <div class="donut-stat-label">Wins</div>
+            </div>
+            <div class="donut-stat losses">
+              <div class="donut-stat-value" id="donutLosses">0</div>
+              <div class="donut-stat-label">Losses</div>
+            </div>
+            <div class="donut-stat pending">
+              <div class="donut-stat-value" id="donutPending">0</div>
+              <div class="donut-stat-label">Pending</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Successful Trades -->
+        <div class="section-title">Recent Wins</div>
+        <div class="recent-wins-list" id="recentWinsList"></div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="bottom-bar">
+    <button class="nav-btn active" data-page="home" onclick="navigateTo('home')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="label">Home</span>
+    </button>
+    <button class="nav-btn" data-page="history" onclick="navigateTo('history')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v2"/></svg>
+      <span class="badge hidden" id="historyBadge">0</span>
+      <span class="label">Profile</span>
+    </button>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toastText">Saved</span>
+</div>
+
+<!-- Platform Selector Modal -->
+<div class="platform-modal" id="platformModal">
+  <div class="platform-modal-box">
+    <div class="platform-modal-title">Select Platform</div>
+    <div class="platform-modal-desc">Choose your trading platform</div>
+    <div class="platform-modal-options">
+      <button class="platform-modal-option" data-platform="QUOTEX" onclick="changePlatform('QUOTEX')">
+        <div class="platform-modal-option-icon">
+          <svg viewBox="0 0 24 24"><line x1="7" y1="3" x2="7" y2="21"/><rect x="4" y="7" width="6" height="9" fill="#000" fill-opacity="0.15"/><line x1="17" y1="2" x2="17" y2="22"/><rect x="14" y="10" width="6" height="7" fill="#000" fill-opacity="0.15"/></svg>
+        </div>
+        <div class="platform-modal-option-info">
+          <div class="platform-modal-option-name">QUOTEX</div>
+          <div class="platform-modal-option-desc">Binary options trading</div>
+        </div>
+        <div class="platform-modal-option-check">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+      </button>
+      <button class="platform-modal-option" data-platform="BINOLLA" onclick="changePlatform('BINOLLA')">
+        <div class="platform-modal-option-icon">
+          <svg viewBox="0 0 24 24"><polyline points="3 17 9 11 13 15 21 7"/><polyline points="14 7 21 7 21 14"/></svg>
+        </div>
+        <div class="platform-modal-option-info">
+          <div class="platform-modal-option-name">BINOLLA</div>
+          <div class="platform-modal-option-desc">Smart advanced trading</div>
+        </div>
+        <div class="platform-modal-option-check">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+      </button>
+    </div>
+    <button class="platform-modal-close" onclick="closePlatformModal()">Cancel</button>
+  </div>
+</div>
+
+<script>
+/* ===== Strategy Definitions ===== */
+const STRATEGIES = {
+  strong: {
+    name: 'Strong',
+    tag: 'High frequency, moderate accuracy',
+    color: '#00ff88',
+    hint: 'Strong mode selected — generates frequent signals',
+    winRate: 0.55,
+    profitRange: [0.3, 1.8],
+    lossRange: [0.4, 1.6],
+    icon: '<svg viewBox="0 0 24 24"><line x1="6" y1="3" x2="6" y2="21"/><rect x="4" y="7" width="4" height="8" fill="currentColor" fill-opacity="0.2"/><line x1="13" y1="5" x2="13" y2="19"/><rect x="11" y="9" width="4" height="6" fill="currentColor" fill-opacity="0.2"/><line x1="19" y1="4" x2="19" y2="20"/><rect x="17" y="8" width="4" height="7" fill="currentColor" fill-opacity="0.2"/></svg>',
+    stats: [
+      {value: '15-25', label: 'Signals/day'},
+      {value: '70%', label: 'Accuracy'},
+      {value: '1-3m', label: 'Duration'}
+    ],
+    features: [
+      {text: 'Generates up to <strong>25 signals per day</strong> to capture maximum market opportunities'},
+      {text: 'Real-time scanning across <strong>multiple timeframes</strong> simultaneously for faster entries'},
+      {text: 'Instant alerts when a signal is confirmed, with <strong>precise entry point</strong> detection'},
+      {text: 'Supports all major assets: currencies, crypto, commodities, and indices'},
+      {text: '<strong>70% accuracy</strong> rate with preliminary filtering to discard weak signals'},
+      {text: 'Best suited for <strong>active traders</strong> who prefer high-volume trading sessions'}
+    ]
+  },
+  medium: {
+    name: 'Medium',
+    tag: 'Balanced signals, steady results',
+    color: '#00d2ff',
+    hint: 'Medium mode selected — balanced signals and results',
+    winRate: 0.65,
+    profitRange: [0.3, 2.0],
+    lossRange: [0.3, 1.5],
+    icon: '<svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="3 6 9 12 13 8 21 14"/><circle cx="13" cy="8" r="1.5" fill="currentColor"/></svg>',
+    stats: [
+      {value: '8-12', label: 'Signals/day'},
+      {value: '80%', label: 'Accuracy'},
+      {value: '2-5m', label: 'Duration'}
+    ],
+    features: [
+      {text: '<strong>Perfect balance</strong> between signal volume and quality for steady, consistent results'},
+      {text: 'Multi-timeframe analysis to <strong>confirm trend direction</strong> before sending any signal'},
+      {text: 'Advanced filtering system automatically excludes <strong>low-quality setups</strong>'},
+      {text: 'Up to <strong>80% accuracy</strong> with built-in risk management rules'},
+      {text: 'Suitable for all levels — from <strong>beginners to advanced traders</strong>'},
+      {text: 'Signals distributed throughout the day with <strong>smart timing</strong> for optimal sessions'}
+    ]
+  },
+  pro: {
+    name: 'Pro',
+    tag: 'Premium accuracy, low frequency',
+    color: '#ab82ff',
+    hint: 'Pro mode selected — premium accuracy, low frequency',
+    winRate: 0.78,
+    profitRange: [0.5, 2.5],
+    lossRange: [0.3, 1.2],
+    icon: '<svg viewBox="0 0 24 24"><polygon points="12 2 22 12 12 22 2 12"/><polyline points="7 12 10 9 14 13 17 10"/></svg>',
+    stats: [
+      {value: '3-5', label: 'Signals/day'},
+      {value: '92%', label: 'Accuracy'},
+      {value: '5-15m', label: 'Duration'}
+    ],
+    features: [
+      {text: 'Hand-picked signals limited to <strong>5 per day</strong> at the highest quality tier'},
+      {text: 'Exceptional <strong>92% accuracy</strong> rate with multi-source confirmation'},
+      {text: 'Deep analysis powered by <strong>AI algorithms</strong> and machine-learning models'},
+      {text: 'Every signal confirmed across <strong>multiple technical indicators</strong> before delivery'},
+      {text: 'Includes news and economic event impact analysis for smarter entries'},
+      {text: 'Built for <strong>professional traders</strong> who prioritize quality over quantity'}
+    ]
+  }
+};
+
+/* ===== State ===== */
+const State = {
+  currentPage: 'home',
+  currentFilter: 'all',
+  strategy: 'strong',
+  platform: 'QUOTEX',
+  isRunning: false,
+  sessionTimer: null,
+  nextSignalTimer: null,
+  sessionStartTime: null,
+  sessionTime: '09:00',
+  signalsCount: 10,
+  signalsSent: 0,
+  credits: 900,
+  costPerSignal: 1,
+  dailyLimit: 50,
+  chatId: '',
+  trades: []
+};
+
+/* ===== Cost per signal for each bot type ===== */
+const BOT_COST = {
+  strong: 1,
+  medium: 3,
+  pro: 6
+};
+
+const TOTAL_CREDITS = 900; // initial monthly grant
+
+/* ===== Sample Trades ===== */
+const SAMPLE_TRADES = [
+  {id:1,symbol:'BTC/USDT',short:'BTC',type:'buy',entry:67234.50,exit:67890.20,duration:120,time:'14:32',result:'win',profit:0.98},
+  {id:2,symbol:'ETH/USDT',short:'ETH',type:'buy',entry:3456.20,exit:3512.80,duration:180,time:'14:15',result:'win',profit:1.63},
+  {id:3,symbol:'SOL/USDT',short:'SOL',type:'sell',entry:178.50,exit:176.20,duration:90,time:'13:48',result:'win',profit:1.29},
+  {id:4,symbol:'XRP/USDT',short:'XRP',type:'buy',entry:0.5432,exit:0.5398,duration:240,time:'13:20',result:'loss',profit:-0.63},
+  {id:5,symbol:'AVAX/USDT',short:'AVAX',type:'buy',entry:38.76,exit:39.45,duration:60,time:'12:55',result:'win',profit:1.78},
+  {id:6,symbol:'DOGE/USDT',short:'DOGE',type:'sell',entry:0.1654,exit:0.1689,duration:150,time:'12:30',result:'loss',profit:-2.12},
+  {id:7,symbol:'LINK/USDT',short:'LINK',type:'buy',entry:14.56,exit:0,duration:120,time:'12:05',result:'pending',profit:0},
+  {id:8,symbol:'ADA/USDT',short:'ADA',type:'sell',entry:0.4521,exit:0,duration:90,time:'11:40',result:'pending',profit:0}
+];
+
+State.trades = SAMPLE_TRADES;
+
+/* ===== Utilities ===== */
+function formatPrice(p){
+  if(p>=1000) return p.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(p>=1) return p.toFixed(2);
+  return p.toFixed(4);
+}
+function escapeHtml(s){
+  if(s===null||s===undefined) return '';
+  const d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+
+/* ===== Logo Intro Sequence ===== */
+(function(){
+  // Skip intro and platform selection when embedded in an iframe (shell page)
+  var params = new URLSearchParams(window.location.search);
+  var isEmbedded = params.get('embed') === '1' || (window.self !== window.top);
+  if(isEmbedded){
+    // Hide logo screen and platform screen immediately, show app
+    var ls = document.getElementById('logoScreen');
+    if(ls) ls.classList.add('hidden');
+    var ps = document.getElementById('platformScreen');
+    if(ps) ps.classList.remove('visible');
+    document.getElementById('mainApp').classList.add('visible');
+    initSessionTime();
+    updateCreditsDisplay();
+    return;
+  }
+  const logoScreen = document.getElementById('logoScreen');
+  const logoContainer = document.getElementById('logoContainer');
+  setTimeout(function(){
+    logoContainer.classList.add('shown');
+    setTimeout(function(){
+      logoContainer.classList.add('expanded');
+      setTimeout(function(){
+        logoScreen.classList.add('hidden');
+        document.getElementById('platformScreen').classList.add('visible');
+      }, 1500);
+    }, 3000);
+  }, 2000);
+})();
+
+/* ===== Platform Selection ===== */
+function selectPlatform(name){
+  State.platform = name;
+  document.getElementById('platformName').textContent = name;
+  const platformScreen = document.getElementById('platformScreen');
+  platformScreen.classList.add('hidden');
+  setTimeout(function(){
+    platformScreen.classList.remove('visible');
+    document.getElementById('mainApp').classList.add('visible');
+    // Initialize session time with user's local time when the app becomes visible
+    initSessionTime();
+    // Initialize credits display based on default bot (Strong = 1 pt/signal)
+    updateCreditsDisplay();
+  }, 500);
+}
+
+/* ===== Session Time — local-time stepper with +/- buttons ===== */
+function initSessionTime(){
+  // Use current local time as default
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  State.sessionTime = h + ':' + m;
+  updateSessionTimeDisplay();
+
+  // Detect timezone
+  let tzLabel = 'Local';
+  try{
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if(tz){
+      // e.g. "Africa/Algiers" -> show as-is or short version
+      tzLabel = tz;
+    }
+  }catch(e){
+    // Fallback: UTC offset
+    const offset = -now.getTimezoneOffset();
+    const sign = offset >= 0 ? '+' : '-';
+    const oh = String(Math.floor(Math.abs(offset)/60)).padStart(2,'0');
+    const om = String(Math.abs(offset) % 60).padStart(2,'0');
+    tzLabel = 'UTC' + sign + oh + ':' + om;
+  }
+  const tzEl = document.getElementById('sessionTzName');
+  if(tzEl) tzEl.textContent = tzLabel;
+}
+
+function updateSessionTimeDisplay(){
+  const parts = State.sessionTime.split(':');
+  const hEl = document.getElementById('sessionHour');
+  const mEl = document.getElementById('sessionMinute');
+  if(hEl) hEl.textContent = parts[0];
+  if(mEl) mEl.textContent = parts[1];
+}
+
+function adjustSessionTime(unit, delta){
+  let parts = State.sessionTime.split(':').map(function(s){return parseInt(s,10);});
+  let h = parts[0];
+  let m = parts[1];
+  if(unit === 'hour'){
+    h = (h + delta + 24) % 24;
+  } else if(unit === 'minute'){
+    m = (m + delta + 60) % 60;
+  }
+  State.sessionTime = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0');
+  updateSessionTimeDisplay();
+}
+
+/* ===== Navigation ===== */
+function navigateTo(page){
+  State.currentPage = page;
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    b.classList.toggle('active',b.dataset.page===page);
+  });
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const target = document.getElementById(page+'Page');
+  if(target) target.classList.add('active');
+  if(page==='history') renderTrades();
+}
+
+/* ===== Strategy Detail Page ===== */
+function openStrategyDetail(strategy){
+  const data = STRATEGIES[strategy];
+  const content = document.getElementById('strategyDetailContent');
+  content.innerHTML = `
+    <div class="detail-page" data-strategy="${strategy}">
+      <div class="detail-hero" data-strategy="${strategy}">
+        <div class="detail-hero-icon">${data.icon}</div>
+        <div class="detail-hero-name">${data.name}</div>
+        <div class="detail-hero-tag">${data.tag}</div>
+      </div>
+      <div class="detail-stats">
+        ${data.stats.map(s => `
+          <div class="detail-stat">
+            <div class="detail-stat-value">${s.value}</div>
+            <div class="detail-stat-label">${s.label}</div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="detail-features">
+        <div class="detail-features-title">Features</div>
+        ${data.features.map(f => `
+          <div class="detail-feature">
+            <div class="detail-feature-check">
+              <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div class="detail-feature-text">${f.text}</div>
+          </div>
+        `).join('')}
+      </div>
+      <button class="detail-activate" onclick="activateStrategy('${strategy}')">
+        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+        <span>Activate ${data.name} Strategy</span>
+      </button>
+    </div>
+  `;
+  navigateTo('strategyDetail');
+}
+
+function activateStrategy(strategy){
+  State.strategy = strategy;
+  State.costPerSignal = BOT_COST[strategy] || 1;
+  updateCreditsDisplay();
+  const data = STRATEGIES[strategy];
+  showToast(data.name + ' strategy activated · ' + State.costPerSignal + ' pts/signal', 'success');
+  setTimeout(() => navigateTo('home'), 800);
+}
+
+/* ===== Update Credits Display (dynamic based on selected bot) ===== */
+function updateCreditsDisplay(){
+  const cost = State.costPerSignal;
+  const credits = State.credits;
+  const remaining = cost > 0 ? Math.floor(credits / cost) : 0;
+  const monthlyCap = Math.min(remaining, State.dailyLimit * 30);
+
+  // Cost per signal text
+  const costEl = document.getElementById('costPerSignal');
+  if(costEl) costEl.textContent = cost + ' pt' + (cost > 1 ? 's' : '');
+
+  // Signals remaining
+  const remEl = document.getElementById('remainingSignals');
+  if(remEl){
+    remEl.textContent = monthlyCap.toLocaleString('en-US');
+    // Color: green if plenty, yellow if low, red if very low
+    remEl.classList.remove('positive','negative');
+    if(monthlyCap >= 100) remEl.classList.add('positive');
+    else if(monthlyCap >= 20) remEl.style.color = '#ffaa00';
+    else remEl.style.color = '#ff4466';
+  }
+
+  // Update credits circle value (points left)
+  const valEl = document.getElementById('creditsValue');
+  if(valEl) valEl.textContent = credits;
+
+  // Update circle progress (filled = remaining credits / total)
+  // When credits = 900 (full), ring is fully colored
+  // When credits = 0 (empty), ring is fully empty
+  const circleEl = document.getElementById('creditsCircle');
+  if(circleEl){
+    const circumference = 263.9;
+    const ratio = Math.max(0, Math.min(1, credits / TOTAL_CREDITS));
+    // offset = circumference means EMPTY; offset = 0 means FULL
+    // So when ratio = 1 (full credits), offset = 0 (full ring shown)
+    const offset = circumference * (1 - ratio);
+    circleEl.style.strokeDashoffset = offset;
+  }
+
+  // Highlight the active cost chip
+  ['strong','medium','pro'].forEach(bot=>{
+    const chip = document.getElementById('costChip' + bot.charAt(0).toUpperCase() + bot.slice(1));
+    if(chip){
+      chip.classList.toggle('active', bot === State.strategy);
+    }
+  });
+}
+
+/* ===== Filter Chips ===== */
+document.querySelectorAll('.filter-chip').forEach(chip=>{
+  chip.addEventListener('click',()=>{
+    document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+    chip.classList.add('active');
+    State.currentFilter = chip.dataset.filter;
+    renderTrades();
+  });
+});
+
+/* ===== Render Profile Page (stats + charts + recent wins) ===== */
+let winRateChartInstance = null;
+let donutChartInstance = null;
+
+function renderTrades(){
+  // Compute stats from State.trades
+  const total = State.trades.length;
+  const wins = State.trades.filter(t=>t.result==='win').length;
+  const losses = State.trades.filter(t=>t.result==='loss').length;
+  const pending = State.trades.filter(t=>t.result==='pending').length;
+  const decided = wins + losses;
+  const winRate = decided > 0 ? Math.round((wins / decided) * 100) : 0;
+
+  // Profile stats
+  setText('pstatTotal', total);
+  setText('pstatWins', wins);
+  setText('pstatLosses', losses);
+  setText('pstatRate', winRate + '%');
+  setText('profileWinRate', winRate + '%');
+
+  // Doughnut stats
+  setText('donutWins', wins);
+  setText('donutLosses', losses);
+  setText('donutPending', pending);
+
+  // Recent wins list (last 5 wins)
+  const recentWins = State.trades.filter(t=>t.result==='win').slice(0,5);
+  const winsList = document.getElementById('recentWinsList');
+  if(winsList){
+    if(recentWins.length === 0){
+      winsList.innerHTML = `<div class="empty-state">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <div>No winning trades yet</div>
+      </div>`;
+    } else {
+      winsList.innerHTML = recentWins.map(t=>`
+        <div class="recent-win-item">
+          <div class="recent-win-icon">${escapeHtml(t.short)}</div>
+          <div class="recent-win-info">
+            <div class="recent-win-symbol">${escapeHtml(t.symbol)}</div>
+            <div class="recent-win-meta">${t.duration}s · ${t.time} · ${t.type.toUpperCase()}</div>
+          </div>
+          <div class="recent-win-profit">+${t.profit.toFixed(2)}%</div>
+        </div>
+      `).join('');
+    }
+  }
+
+  // Render charts
+  renderWinRateChart();
+  renderDonutChart(wins, losses, pending);
+}
+
+function setText(id, val){
+  const el = document.getElementById(id);
+  if(el) el.textContent = val;
+}
+
+/* ===== Chart 1: Win Rate Over Time (Line Chart) ===== */
+function renderWinRateChart(){
+  const canvas = document.getElementById('winRateChart');
+  if(!canvas || typeof Chart === 'undefined') return;
+
+  // Generate last 7 days of win-rate data (deterministic for demo)
+  // Based on State.trades distribution per day
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const winRates = [62, 71, 68, 75, 80, 73, 78];
+
+  // Destroy previous chart if exists
+  if(winRateChartInstance) winRateChartInstance.destroy();
+
+  const ctx = canvas.getContext('2d');
+  // Gradient fill
+  const gradient = ctx.createLinearGradient(0, 0, 0, 180);
+  gradient.addColorStop(0, 'rgba(0, 210, 255, 0.35)');
+  gradient.addColorStop(1, 'rgba(0, 210, 255, 0)');
+
+  winRateChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: days,
+      datasets: [{
+        label: 'Win Rate %',
+        data: winRates,
+        borderColor: '#00d2ff',
+        backgroundColor: gradient,
+        borderWidth: 2.5,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#00d2ff',
+        pointBorderColor: '#000',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        pointHoverBackgroundColor: '#00f0ff',
+        pointHoverBorderColor: '#fff',
+        pointHoverBorderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(10,10,10,0.95)',
+          borderColor: '#00d2ff',
+          borderWidth: 1,
+          titleColor: '#fff',
+          bodyColor: '#00d2ff',
+          padding: 10,
+          displayColors: false,
+          callbacks: {
+            label: function(ctx){ return ctx.parsed.y + '% win rate'; }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          min: 50,
+          max: 100,
+          ticks: {
+            color: '#666',
+            font: { size: 10, family: 'Inter' },
+            callback: function(v){ return v + '%'; },
+            stepSize: 10
+          },
+          grid: { color: 'rgba(255,255,255,0.04)' },
+          border: { display: false }
+        },
+        x: {
+          ticks: {
+            color: '#666',
+            font: { size: 10, family: 'Inter' }
+          },
+          grid: { display: false },
+          border: { display: false }
+        }
+      },
+      interaction: { intersect: false, mode: 'index' }
+    }
+  });
+}
+
+/* ===== Chart 2: Signal Distribution (Doughnut Chart) ===== */
+function renderDonutChart(wins, losses, pending){
+  const canvas = document.getElementById('donutChart');
+  if(!canvas || typeof Chart === 'undefined') return;
+
+  if(donutChartInstance) donutChartInstance.destroy();
+
+  const ctx = canvas.getContext('2d');
+  donutChartInstance = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Wins', 'Losses', 'Pending'],
+      datasets: [{
+        data: [wins, losses, pending],
+        backgroundColor: ['#00ff88', '#ff4466', '#ffaa00'],
+        borderColor: '#080808',
+        borderWidth: 3,
+        hoverOffset: 8,
+        hoverBorderColor: '#000'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '68%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(10,10,10,0.95)',
+          borderColor: '#00d2ff',
+          borderWidth: 1,
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          padding: 10,
+          displayColors: true,
+          callbacks: {
+            label: function(ctx){
+              const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+              const pct = total > 0 ? Math.round((ctx.parsed / total) * 100) : 0;
+              return ctx.label + ': ' + ctx.parsed + ' (' + pct + '%)';
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+/* ===== Session Control ===== */
+function toggleSession(){
+  State.isRunning = !State.isRunning;
+  const btn = document.getElementById('runBtn');
+  const text = document.getElementById('runBtnText');
+  if(State.isRunning){
+    btn.classList.add('running');
+    text.textContent = 'Stop Session';
+    showToast('Session started', 'success');
+    document.getElementById('sessionCard').style.display = 'block';
+  } else {
+    btn.classList.remove('running');
+    text.textContent = 'Start Session';
+    showToast('Session stopped', 'error');
+  }
+}
+
+/* ===== Toast ===== */
+let toastTimer;
+function showToast(text, type){
+  const toast = document.getElementById('toast');
+  const toastText = document.getElementById('toastText');
+  toastText.textContent = text;
+  toast.classList.remove('error');
+  if(type === 'error') toast.classList.add('error');
+  toast.classList.add('visible');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => toast.classList.remove('visible'), 2500);
+}
+
+/* ===== Telegram User Data Integration ===== */
+State.tgUser = null;
+function initTelegramUser(){
+  var p = new URLSearchParams(location.search);
+  var tgId = p.get('tg_id');
+  if(tgId){
+    State.tgUser = {
+      id: tgId,
+      name: p.get('tg_name') || 'Trader',
+      firstName: p.get('tg_first') || '',
+      lastName: p.get('tg_last') || '',
+      username: p.get('tg_username') || '',
+      photoUrl: p.get('tg_photo') || '',
+      language: p.get('tg_lang') || 'en',
+      platform: p.get('tg_platform') || 'QUOTEX'
+    };
+    updateProfileFromTelegram();
+  }
+}
+
+function updateProfileFromTelegram(){
+  if(!State.tgUser) return;
+  var u = State.tgUser;
+
+  // Update name
+  var nameEl = document.getElementById('profileName');
+  if(nameEl) nameEl.textContent = u.name;
+
+  // Update username
+  var unameEl = document.getElementById('profileUsername');
+  if(unameEl) unameEl.textContent = u.username ? '@' + u.username : '@user_' + u.id;
+
+  // Update ID
+  var idEl = document.getElementById('profileId');
+  if(idEl) idEl.textContent = u.id;
+
+  // Update avatar
+  var avatarText = document.getElementById('profileAvatarText');
+  var avatarImg = document.getElementById('profileAvatarImg');
+  if(u.photoUrl && avatarImg){
+    avatarImg.src = u.photoUrl;
+    avatarImg.style.display = 'block';
+    if(avatarText) avatarText.style.display = 'none';
+  }else if(avatarText){
+    // Use initials from name
+    var initials = '';
+    var parts = u.name.split(' ');
+    if(parts.length >= 2){
+      initials = parts[0].charAt(0) + parts[1].charAt(0);
+    }else if(u.name.length >= 2){
+      initials = u.name.substring(0, 2);
+    }else{
+      initials = 'QX';
+    }
+    avatarText.textContent = initials.toUpperCase();
+  }
+
+  // Update platform badge if present
+  if(u.platform){
+    var pfEl = document.getElementById('activePlatform');
+    if(pfEl) pfEl.textContent = u.platform;
+  }
+}
+
+// Run on load
+initTelegramUser();
+
+/* ===== Platform Selector Modal ===== */
+function openPlatformModal(){
+  var modal = document.getElementById('platformModal');
+  // Mark current platform as selected
+  var current = State.platform || 'QUOTEX';
+  document.querySelectorAll('.platform-modal-option').forEach(function(opt){
+    opt.classList.toggle('selected', opt.getAttribute('data-platform') === current);
+  });
+  modal.classList.add('visible');
+}
+
+function closePlatformModal(){
+  document.getElementById('platformModal').classList.remove('visible');
+}
+
+function changePlatform(name){
+  State.platform = name;
+  var nameEl = document.getElementById('platformName');
+  if(nameEl) nameEl.textContent = name;
+  var badgeEl = document.getElementById('activePlatform');
+  if(badgeEl) badgeEl.textContent = name;
+  closePlatformModal();
+  showToast('Platform changed to ' + name, 'success');
+}
+
+// Close modal when clicking outside
+document.getElementById('platformModal').addEventListener('click', function(e){
+  if(e.target === this) closePlatformModal();
+});
+</script>
+
+</body>
+</html>

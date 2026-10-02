@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>QuantVexa</title>
+<script>
+// GitHub Pages SPA fallback router
+// When a user visits /quantvexa/dashboard (which doesn't exist as a file),
+// GitHub Pages serves this 404.html. We capture the path and redirect
+// to index.html with the route as a query parameter.
+(function(){
+  var path = window.location.pathname;
+  // Extract the last segment as the route name
+  var segments = path.split('/').filter(function(s){return s.length > 0;});
+  var route = segments[segments.length - 1] || 'dashboard';
+
+  // Valid routes
+  var validRoutes = ['dashboard','signals','wallet','settings'];
+  if(validRoutes.indexOf(route) === -1){
+    route = 'dashboard';
+  }
+
+  // Determine the base directory (e.g. /quantvexa/)
+  var basePath = path.substring(0, path.lastIndexOf('/') + 1);
+  // If the path ends with a valid route, the base is one level up
+  if(validRoutes.indexOf(segments[segments.length - 1]) !== -1){
+    basePath = path.substring(0, path.lastIndexOf('/')) + '/';
+    if(basePath === '/' || basePath === ''){
+      basePath = '/';
+    }
+  }
+
+  // Redirect to index.html with route param
+  // index.html will read this and show the correct page, then use
+  // history.replaceState to show the clean URL
+  var redirectUrl = basePath + '?route=' + route;
+  window.location.replace(redirectUrl);
+})();
+</script>
+</head>
+<body>
+Redirecting to QuantVexa...
+</body>
+</html>

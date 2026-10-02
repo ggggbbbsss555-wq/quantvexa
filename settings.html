@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+<title>Support Chat</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-600-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+*::-webkit-scrollbar{width:6px;height:6px;background:transparent}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:rgba(140,140,140,0.3);border-radius:10px}
+*::-webkit-scrollbar-button{display:none}
+html,body{width:100%;height:100%;height:100dvh;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#000;color:#fff;overflow:hidden;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%}
+:root{
+  --bg:#000;--bg2:#0a0a0a;--bg3:#111;--bg4:#1a1a1a;
+  --border:#1f1f1f;--border2:#2a2a2a;
+  --text:#fff;--text2:#aaa;--text3:#888;--text4:#666;
+  --accent:#00d2ff;--accent2:#0099cc;
+  --like:#ff4466;--success:#00ff88;--gold:#ffaa00;
+  --hover:rgba(255,255,255,0.06);
+  --sent-grad:linear-gradient(135deg,#00d2ff 0%,#0099cc 100%);
+  --sent-text:#000;
+}
+
+/* ===== App container ===== */
+.chat-app{
+  position:relative;width:100%;height:100%;height:100dvh;
+  max-width:560px;margin:0 auto;
+  display:flex;flex-direction:column;
+  background:var(--bg);
+  overflow:hidden;
+}
+
+/* ===== Header ===== */
+.chat-header{
+  display:flex;align-items:center;gap:12px;
+  padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top,0px));
+  background:var(--bg);border-bottom:1px solid var(--border);
+  flex:0 0 auto;z-index:5;
+}
+.chat-avatar{
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(0,210,255,0.25);
+}
+.chat-avatar svg{width:22px;height:22px;stroke:#000;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chat-info{flex:1;min-width:0}
+.chat-name{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-status{font-size:11px;color:var(--text3);margin-top:2px;display:flex;align-items:center;gap:6px}
+.chat-status .dot{width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 6px var(--success)}
+
+/* ===== Messages area ===== */
+.messages{
+  flex:1 1 auto;min-height:0;
+  overflow-y:auto;overflow-x:hidden;
+  padding:16px;display:flex;flex-direction:column;gap:8px;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  scroll-behavior:smooth;
+}
+.msg{
+  max-width:80%;padding:9px 13px;border-radius:18px;
+  font-size:14px;line-height:1.45;word-wrap:break-word;
+  flex-shrink:0;animation:msgIn 0.25s ease;
+}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.msg.sent{
+  align-self:flex-end;background:var(--sent-grad);color:var(--sent-text);
+  border-bottom-right-radius:4px;
+}
+.msg.received{
+  align-self:flex-start;background:var(--bg3);color:var(--text);
+  border-bottom-left-radius:4px;border:1px solid var(--border);
+}
+.msg.received b{color:var(--accent);font-weight:700}
+.msg-time{font-size:10px;opacity:0.7;margin-top:3px}
+
+/* ===== Typing indicator ===== */
+.typing{
+  align-self:flex-start;
+  display:flex;align-items:center;gap:4px;
+  padding:12px 16px;background:var(--bg3);
+  border:1px solid var(--border);border-radius:18px;border-bottom-left-radius:4px;
+  animation:msgIn 0.25s ease;
+}
+.typing-dot{
+  width:7px;height:7px;border-radius:50%;background:var(--text3);
+  animation:typingBounce 1.4s infinite ease-in-out;
+}
+.typing-dot:nth-child(2){animation-delay:0.2s}
+.typing-dot:nth-child(3){animation-delay:0.4s}
+@keyframes typingBounce{
+  0%,60%,100%{transform:translateY(0);opacity:0.4}
+  30%{transform:translateY(-6px);opacity:1}
+}
+
+/* ===== Empty state hint ===== */
+.empty-hint{
+  text-align:center;color:var(--text3);font-size:12px;
+  padding:20px 16px;margin:auto 0;
+}
+.empty-hint b{color:var(--accent);font-weight:700;display:block;margin-bottom:6px;font-size:14px}
+
+/* ===== FAQ Panel ===== */
+.faq-panel{
+  flex:0 0 auto;background:var(--bg2);
+  border-top:1px solid var(--border);
+  padding:14px 16px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));
+  display:flex;flex-direction:column;gap:10px;
+  max-height:55%;overflow-y:auto;
+  animation:slideUp 0.3s ease;
+}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.faq-title{
+  font-size:11px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:0.6px;
+  display:flex;align-items:center;gap:6px;
+}
+.faq-title svg{width:14px;height:14px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.faq-list{display:flex;flex-direction:column;gap:6px}
+.faq-btn{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  width:100%;padding:11px 14px;
+  background:var(--bg4);border:1px solid var(--border2);
+  border-radius:12px;cursor:pointer;color:var(--text);
+  font-family:inherit;font-size:13px;font-weight:500;text-align:left;
+  transition:all 0.15s ease;
+}
+.faq-btn:hover{border-color:var(--accent);background:var(--hover);box-shadow:0 0 0 1px rgba(0,210,255,0.2)}
+.faq-btn:active{transform:scale(0.98)}
+.faq-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+.faq-btn svg{width:14px;height:14px;stroke:var(--text3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ===== Real Support Button ===== */
+.real-support-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:12px 14px;margin-top:4px;
+  border:none;border-radius:12px;
+  background:linear-gradient(180deg,var(--accent) 0%,var(--accent2) 100%);
+  color:var(--sent-text);font-family:inherit;font-weight:700;font-size:13.5px;
+  cursor:pointer;transition:all 0.2s ease;
+}
+.real-support-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,210,255,0.3)}
+.real-support-btn:active{transform:translateY(0) scale(0.98)}
+.real-support-btn svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== Input area (live support mode) ===== */
+.input-area{
+  flex:0 0 auto;background:var(--bg2);
+  border-top:1px solid var(--border);
+  padding:14px 16px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));
+  display:none;align-items:flex-end;gap:10px;
+  animation:slideUp 0.3s ease;
+}
+.input-area.visible{display:flex}
+.chat-input{
+  flex:1;min-width:0;
+  padding:13px 18px;background:var(--bg4);
+  border:1px solid var(--border2);border-radius:24px;
+  color:var(--text);font-family:inherit;font-size:15px;
+  resize:none;outline:none;
+  min-height:48px;
+  max-height:140px;line-height:1.5;
+  transition:border-color 0.15s ease,box-shadow 0.15s ease;
+}
+.chat-input:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(0,210,255,0.12);
+}
+.chat-input::placeholder{color:var(--text4)}
+.send-btn{
+  width:48px;height:48px;border-radius:50%;
+  border:none;background:var(--sent-grad);color:var(--sent-text);
+  cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  transition:transform 0.1s ease,opacity 0.15s ease,box-shadow 0.15s ease;
+  box-shadow:0 2px 8px rgba(0,210,255,0.25);
+}
+.send-btn:hover{opacity:0.95;box-shadow:0 4px 14px rgba(0,210,255,0.35)}
+.send-btn:active{transform:scale(0.92)}
+.send-btn:disabled{opacity:0.4;cursor:not-allowed;box-shadow:none}
+.send-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== Back to FAQ button (in live mode) ===== */
+.back-to-faq{
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  width:100%;padding:8px;margin-top:6px;
+  background:transparent;border:none;color:var(--text3);
+  font-family:inherit;font-size:11px;font-weight:600;cursor:pointer;
+  text-decoration:underline;
+}
+.back-to-faq:hover{color:var(--accent)}
+
+/* ===== Toast ===== */
+#toast{
+  position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--bg4);color:var(--text);
+  padding:10px 16px;border-radius:24px;
+  border:1px solid var(--border2);
+  font-size:13px;font-weight:500;
+  display:flex;align-items:center;gap:8px;
+  opacity:0;pointer-events:none;
+  transition:all 0.25s ease;z-index:1000;
+  box-shadow:0 4px 16px rgba(0,0,0,0.5);
+}
+#toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ===== Responsive tweaks ===== */
+@media (max-width:380px){
+  .msg{max-width:86%;font-size:13.5px}
+  .faq-btn{font-size:12.5px;padding:10px 12px}
+}
+</style>
+</head>
+<body>
+<div class="chat-app">
+  <!-- Header -->
+  <header class="chat-header">
+    <div class="chat-avatar">
+      <svg viewBox="0 0 24 24"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+    </div>
+    <div class="chat-info">
+      <div class="chat-name">Support</div>
+      <div class="chat-status">
+        <span class="dot"></span>
+        <span>Online</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Messages area -->
+  <main class="messages" id="messages">
+    <div class="empty-hint" id="emptyHint">
+      <b>Hi there!</b>
+      Tap a question below to get an instant answer, or click "Get real support" to chat with a live agent.
+    </div>
+  </main>
+
+  <!-- FAQ Panel (default mode) -->
+  <div class="faq-panel" id="faqPanel">
+    <div class="faq-title">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      Frequently Asked Questions
+    </div>
+    <div class="faq-list" id="faqList">
+      <!-- FAQ buttons injected by JS -->
+    </div>
+    <button class="real-support-btn" id="realSupportBtn" onclick="startRealSupport()">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Get real support</span>
+    </button>
+  </div>
+
+  <!-- Input area (live support mode) -->
+  <div class="input-area" id="inputArea">
+    <textarea class="chat-input" id="chatInput" placeholder="Type your message..." rows="1"></textarea>
+    <button class="send-btn" id="sendBtn" onclick="sendUserMessage()">
+      <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+    </button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ===== FAQ data ===== */
+const FAQ_LIST = [
+  {
+    q: 'What is this service about?',
+    a: 'This is a subscription-based platform that provides trading signals, market analysis, and tools to help you make smarter trading decisions. Our team of experts monitors the markets 24/7 to deliver actionable insights directly to you.'
+  },
+  {
+    q: 'How much does it cost?',
+    a: 'We offer three plans: <b>Basic</b> ($50/month), <b>Pro</b> ($75/month), and <b>Elite</b> ($100/month). Each plan includes different signal limits and feature access. You can upgrade or downgrade at any time.'
+  },
+  {
+    q: 'What payment methods do you accept?',
+    a: 'We currently accept <b>Binance Pay</b>, <b>USDT on TRC20</b> (TRON network), and <b>USDT on BEP20</b> (BSC network). All payments are verified securely on the blockchain.'
+  },
+  {
+    q: 'How do I subscribe?',
+    a: 'Just pick the plan that fits your needs, click <b>Choose [Plan]</b>, enter a discount code if you have one (or skip), then select your preferred payment method to complete the purchase. Your subscription activates as soon as the payment is verified.'
+  },
+  {
+    q: 'Can I cancel my subscription?',
+    a: 'Yes, you can cancel anytime from your account settings. There are no cancellation fees, and you keep full access to all features until the end of your current billing period.'
+  },
+  {
+    q: 'Is there a refund policy?',
+    a: 'Absolutely. We offer a <b>30-day money-back guarantee</b> on all paid plans. If you\'re not satisfied within the first 30 days, contact our support team for a full refund — no questions asked.'
+  }
+];
+
+/* ===== State ===== */
+const State = {
+  messages: [],
+  isTyping: false,
+  isLiveMode: false  // false = FAQ mode, true = live agent mode
+};
+
+/* ===== DOM refs ===== */
+const messagesEl   = document.getElementById('messages');
+const emptyHint    = document.getElementById('emptyHint');
+const faqPanel     = document.getElementById('faqPanel');
+const faqList      = document.getElementById('faqList');
+const realSupportBtn = document.getElementById('realSupportBtn');
+const inputArea    = document.getElementById('inputArea');
+const chatInput    = document.getElementById('chatInput');
+const sendBtn      = document.getElementById('sendBtn');
+
+/* ===== Toast ===== */
+let toastTimer = null;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('visible');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('visible'), 2000);
+}
+
+/* ===== Time helper ===== */
+function nowTime(){
+  const n = new Date();
+  return n.getHours().toString().padStart(2,'0') + ':' + n.getMinutes().toString().padStart(2,'0');
+}
+
+/* ===== Render FAQ buttons ===== */
+function renderFaqList(){
+  faqList.innerHTML = '';
+  FAQ_LIST.forEach((item, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'faq-btn';
+    btn.type = 'button';
+    btn.textContent = item.q;
+    btn.onclick = () => askFaq(idx);
+    faqList.appendChild(btn);
+  });
+}
+
+/* ===== Append a message to the chat (and State) ===== */
+function appendMessage(text, sender){
+  // Remove the empty hint once we have any message
+  if(emptyHint && emptyHint.parentNode){
+    emptyHint.parentNode.removeChild(emptyHint);
+  }
+  const msg = {txt: text, s: sender === 'sent', tm: nowTime()};
+  State.messages.push(msg);
+  renderMessage(msg);
+  scrollToBottom();
+}
+
+function renderMessage(msg){
+  const div = document.createElement('div');
+  div.className = 'msg ' + (msg.s ? 'sent' : 'received');
+  div.innerHTML = msg.txt + '<div class="msg-time">' + msg.tm + '</div>';
+  messagesEl.appendChild(div);
+}
+
+function scrollToBottom(){
+  requestAnimationFrame(()=>{
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  });
+}
+
+/* ===== Typing indicator ===== */
+function showTyping(){
+  const typing = document.createElement('div');
+  typing.className = 'typing';
+  typing.id = 'typingIndicator';
+  typing.innerHTML = '<span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span>';
+  messagesEl.appendChild(typing);
+  scrollToBottom();
+}
+function removeTyping(){
+  const t = document.getElementById('typingIndicator');
+  if(t) t.remove();
+}
+
+/* ===== FAQ click handler ===== */
+function askFaq(idx){
+  if(State.isTyping) return;  // prevent queueing while bot is "typing"
+  const item = FAQ_LIST[idx];
+  if(!item) return;
+
+  // 1. User-side: show the question as a sent message
+  appendMessage(escapeHtml(item.q), 'sent');
+
+  // 2. Disable all FAQ buttons while typing
+  setFaqButtonsDisabled(true);
+  State.isTyping = true;
+
+  // 3. Show typing indicator
+  showTyping();
+
+  // 4. After 2 seconds, replace typing with the answer (received)
+  setTimeout(()=>{
+    removeTyping();
+    appendMessage(item.a, 'received');
+    State.isTyping = false;
+    setFaqButtonsDisabled(false);
+    // FAQ panel is still visible — user can click another question.
+    // Previous chat is preserved.
+  }, 2000);
+}
+
+function setFaqButtonsDisabled(disabled){
+  faqList.querySelectorAll('.faq-btn').forEach(b => { b.disabled = disabled; });
+}
+
+/* ===== "Get real support" handler — starts a fresh live chat ===== */
+function startRealSupport(){
+  // 1. Clear all previous messages
+  State.messages = [];
+  messagesEl.innerHTML = '';
+
+  // 2. Switch UI: hide FAQ panel, show input area
+  faqPanel.style.display = 'none';
+  inputArea.classList.add('visible');
+  State.isLiveMode = true;
+
+  // 3. Bot sends a welcome message asking the user to explain their problem
+  const welcome = 'Hi! I\'m here to help. <b>Please explain your problem</b> and I\'ll do my best to assist you. Take your time — describe what happened, what you expected, and what you saw instead.';
+  // Small delay so it feels like the agent just came online
+  showTyping();
+  setTimeout(()=>{
+    removeTyping();
+    appendMessage(welcome, 'received');
+    // Focus the input so user can start typing immediately
+    setTimeout(()=>chatInput.focus({preventScroll:true}), 200);
+  }, 800);
+
+  showToast('Connected to a live agent');
+}
+
+/* ===== Live chat: send user message ===== */
+function sendUserMessage(){
+  if(!State.isLiveMode) return;
+  const txt = chatInput.value.trim();
+  if(!txt) return;
+
+  appendMessage(escapeHtml(txt), 'sent');
+  chatInput.value = '';
+  chatInput.style.height = 'auto';
+  autoGrowTextarea();
+  chatInput.focus({preventScroll:true});
+
+  // Simulate a brief agent acknowledgement after the user's message
+  if(!State.isTyping){
+    State.isTyping = true;
+    setTimeout(()=>showTyping(), 300);
+    setTimeout(()=>{
+      removeTyping();
+      const ack = getAgentAck();
+      appendMessage(ack, 'received');
+      State.isTyping = false;
+    }, 2500);
+  }
+}
+
+function getAgentAck(){
+  const replies = [
+    'Got it. Thanks for sharing that — I\'m looking into it for you right now.',
+    'Understood. I\'ll review your message and get back to you with a solution shortly.',
+    'Thanks for the details. Give me a moment to check this on my end.',
+    'I see. That helps me understand the situation — working on it now.',
+    'Appreciate you explaining this. I\'ll have an answer for you in a moment.'
+  ];
+  return replies[Math.floor(Math.random() * replies.length)];
+}
+
+/* ===== Textarea auto-grow ===== */
+function autoGrowTextarea(){
+  chatInput.style.height = 'auto';
+  const newH = Math.min(chatInput.scrollHeight, 140);
+  chatInput.style.height = newH + 'px';
+  sendBtn.disabled = chatInput.value.trim().length === 0;
+}
+chatInput.addEventListener('input', autoGrowTextarea);
+chatInput.addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendUserMessage();
+  }
+});
+
+/* ===== Utility ===== */
+function escapeHtml(text){
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/* ===== Initialize ===== */
+renderFaqList();
+autoGrowTextarea();
+
+/* ===== Telegram User Data Integration ===== */
+var TgUser = null;
+function initTelegramUser(){
+  var p = new URLSearchParams(location.search);
+  var tgId = p.get('tg_id');
+  if(tgId){
+    TgUser = {
+      id: tgId,
+      name: p.get('tg_name') || 'Trader',
+      firstName: p.get('tg_first') || '',
+      lastName: p.get('tg_last') || '',
+      username: p.get('tg_username') || '',
+      photoUrl: p.get('tg_photo') || '',
+      language: p.get('tg_lang') || 'en',
+      platform: p.get('tg_platform') || 'QUOTEX'
+    };
+    updateUserDisplay();
+  }
+}
+
+function updateUserDisplay(){
+  if(!TgUser) return;
+  // Update chat header to show user name
+  var headerName = document.querySelector('.chat-header-name, .header-name');
+  if(headerName && TgUser.name){
+    // Keep "Support" as the chat name but could show user info
+  }
+  // Update welcome message with user name
+  var hint = document.querySelector('.empty-hint, .welcome-text');
+  if(hint && TgUser.firstName){
+    var hintTitle = hint.querySelector('.hint-title, h3, strong');
+    if(hintTitle) hintTitle.textContent = 'Hi ' + TgUser.firstName + '!';
+  }
+}
+
+// Build message payload with user data (for sending to backend/bot)
+function buildMessagePayload(message){
+  return {
+    user: TgUser || {id:'guest', name:'Guest', username:'guest'},
+    message: message,
+    timestamp: Date.now(),
+    source: 'quantvexa_settings'
+  };
+}
+
+initTelegramUser();
+</script>
+</body>
+</html>

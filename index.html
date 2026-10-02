@@ -75,7 +75,7 @@ html,body{
 }
 @keyframes drawHex{to{stroke-dashoffset:0}}
 @keyframes growBar{from{transform:scaleY(0);opacity:0}to{transform:scaleY(1);opacity:1}}
-@keyframes revealHead{to{stroke-dashoffset=0}}
+@keyframes revealHead{to{stroke-dashoffset:0}}
 @media (max-width:600px){
   .logo-container{width:300px;height:300px}
   .logo-container.expanded{transform:translateY(20px) scale(1.6)}
@@ -262,13 +262,13 @@ html,body{
   </div>
 </div>
 
-<!-- ===== Full-screen iframe container (no shell chrome) ===== -->
+<!-- ===== Full-screen iframe container ===== -->
 <div class="page-container" id="pageContainer">
   <div class="frame-loader" id="frameLoader"><div class="spinner"></div></div>
-  <iframe class="page-frame" id="frame-dashboard" data-base="https://ggggbbbsss555-wq.github.io/qxbot/"></iframe>
-  <iframe class="page-frame" id="frame-signals" data-base="https://ggggbbbsss555-wq.github.io/ERQQ/"></iframe>
-  <iframe class="page-frame" id="frame-wallet" data-base="https://ggggbbbsss555-wq.github.io/Support/"></iframe>
-  <iframe class="page-frame" id="frame-settings" data-base="https://ggggbbbsss555-wq.github.io/Support1/"></iframe>
+  <iframe class="page-frame" id="frame-dashboard" data-base="dashboard.html"></iframe>
+  <iframe class="page-frame" id="frame-signals" data-base="signals.html"></iframe>
+  <iframe class="page-frame" id="frame-wallet" data-base="wallet.html"></iframe>
+  <iframe class="page-frame" id="frame-settings" data-base="settings.html"></iframe>
 </div>
 
 <!-- Telegram Web App SDK -->
@@ -283,6 +283,13 @@ var State = {
   appReady: false,
   tgUser: null
 };
+
+/* ===== Detect base path (works for repo subdirectories) ===== */
+function getBasePath(){
+  var path = window.location.pathname;
+  var dir = path.substring(0, path.lastIndexOf('/') + 1);
+  return dir;
+}
 
 /* ===== Telegram User Data ===== */
 function initTelegram(){
@@ -303,17 +310,16 @@ function initTelegram(){
         };
       }
     }
-  }catch(e){console.warn('Telegram init error:',e);}
+  }catch(e){}
 
-  // Fallback: try URL params (for testing outside Telegram)
   if(!State.tgUser){
     var p = new URLSearchParams(location.search);
     if(p.get('tg_id')){
       State.tgUser = {
         id: p.get('tg_id'),
-        first_name: p.get('tg_name') || 'Guest',
-        last_name: '',
-        username: p.get('tg_username') || 'guest',
+        first_name: p.get('tg_first') || '',
+        last_name: p.get('tg_last') || '',
+        username: p.get('tg_username') || '',
         photo_url: p.get('tg_photo') || '',
         language_code: p.get('tg_lang') || 'en',
         full_name: p.get('tg_name') || 'Guest User'
@@ -321,11 +327,11 @@ function initTelegram(){
     }
   }
 
-  // Build iframe URLs with user data
+  var base = getBasePath();
+  var params = 'embed=1';
   if(State.tgUser){
     var u = State.tgUser;
-    var params = 'embed=1'
-      + '&tg_id=' + encodeURIComponent(u.id)
+    params += '&tg_id=' + encodeURIComponent(u.id)
       + '&tg_name=' + encodeURIComponent(u.full_name)
       + '&tg_first=' + encodeURIComponent(u.first_name)
       + '&tg_last=' + encodeURIComponent(u.last_name)
@@ -333,29 +339,45 @@ function initTelegram(){
       + '&tg_photo=' + encodeURIComponent(u.photo_url)
       + '&tg_lang=' + encodeURIComponent(u.language_code)
       + '&tg_platform=' + encodeURIComponent(State.platform);
-    document.querySelectorAll('.page-frame').forEach(function(f){
-      var base = f.getAttribute('data-base');
-      f.setAttribute('data-src', base + '?' + params);
-    });
-  }else{
-    // No Telegram data — use embed mode only
-    document.querySelectorAll('.page-frame').forEach(function(f){
-      var base = f.getAttribute('data-base');
-      f.setAttribute('data-src', base + '?embed=1');
-    });
   }
+  document.querySelectorAll('.page-frame').forEach(function(f){
+    var file = f.getAttribute('data-base');
+    f.setAttribute('data-src', base + file + '?' + params);
+  });
 }
 
 initTelegram();
 
+/* ===== Get current route from URL (path-based, no #) ===== */
+function getCurrentRoute(){
+  var params = new URLSearchParams(location.search);
+  var routeParam = params.get('route');
+  if(routeParam){
+    var page = routeParam.replace(/\//g,'');
+    if(['dashboard','signals','wallet','settings'].indexOf(page) !== -1){
+      return page;
+    }
+  }
+  var path = location.pathname;
+  var parts = path.split('/').filter(function(p){return p.length > 0;});
+  var last = parts[parts.length - 1];
+  if(['dashboard','signals','wallet','settings'].indexOf(last) !== -1){
+    return last;
+  }
+  return 'dashboard';
+}
+
 /* ===== Logo Intro Sequence ===== */
 (function(){
-  // If URL has a hash, skip intro and platform selection entirely
-  var hash = location.hash.replace('#','');
-  if(hash && ['dashboard','signals','wallet','settings'].indexOf(hash) !== -1){
+  var route = getCurrentRoute();
+  if(route !== 'dashboard' || location.search.indexOf('route=') !== -1){
     document.getElementById('logoScreen').classList.add('hidden');
     State.appReady = true;
-    showPage(hash);
+    showPage(route);
+    if(location.search.indexOf('route=') !== -1){
+      var basePath = getBasePath();
+      history.replaceState(null, '', basePath + route);
+    }
     return;
   }
   var logoScreen = document.getElementById('logoScreen');
@@ -375,6 +397,7 @@ initTelegram();
 /* ===== Platform Selection ===== */
 function selectPlatform(name){
   State.platform = name;
+  initTelegram();
   var platformScreen = document.getElementById('platformScreen');
   platformScreen.classList.add('hidden');
   setTimeout(function(){
@@ -384,25 +407,22 @@ function selectPlatform(name){
   }, 500);
 }
 
-/* ===== Page Navigation (hash-based routing) ===== */
+/* ===== Page Navigation (path-based routing, no #) ===== */
 function showPage(page){
   State.currentPage = page;
+  var basePath = getBasePath();
+  var newUrl = basePath + page;
+  try{
+    history.pushState({page:page}, '', newUrl);
+  }catch(e){}
 
-  // Update URL hash
-  if(location.hash !== '#' + page){
-    try{history.replaceState(null,'','#'+page);}catch(e){}
-  }
-
-  // Hide all frames
   document.querySelectorAll('.page-frame').forEach(function(f){
     f.classList.remove('active');
   });
 
-  // Show target frame
   var frame = document.getElementById('frame-' + page);
   if(!frame) return;
 
-  // Lazy-load: set src only once
   if(!State.loadedFrames[page]){
     var loader = document.getElementById('frameLoader');
     loader.classList.add('visible');
@@ -419,11 +439,28 @@ function showPage(page){
   frame.classList.add('active');
 }
 
-/* ===== Hash-based routing ===== */
-window.addEventListener('hashchange', function(){
-  var page = location.hash.replace('#','') || 'dashboard';
+/* ===== Handle browser back/forward ===== */
+window.addEventListener('popstate', function(e){
+  var page = getCurrentRoute();
   if(['dashboard','signals','wallet','settings'].indexOf(page) !== -1){
-    showPage(page);
+    State.currentPage = page;
+    document.querySelectorAll('.page-frame').forEach(function(f){
+      f.classList.remove('active');
+    });
+    var frame = document.getElementById('frame-' + page);
+    if(frame){
+      if(!State.loadedFrames[page]){
+        var loader = document.getElementById('frameLoader');
+        loader.classList.add('visible');
+        frame.src = frame.getAttribute('data-src');
+        frame.addEventListener('load', function(){
+          loader.classList.remove('visible');
+          State.loadedFrames[page] = true;
+        });
+        setTimeout(function(){loader.classList.remove('visible');}, 8000);
+      }
+      frame.classList.add('active');
+    }
   }
 });
 </script>

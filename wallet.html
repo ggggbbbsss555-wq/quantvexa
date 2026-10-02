@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+<title>Subscriptions — Manage Your Plan</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-400-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-600-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-800-normal.css">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+*,*::before,*::after{scrollbar-width:thin;scrollbar-color:rgba(140,140,140,0.3) transparent}
+*::-webkit-scrollbar{width:6px;height:6px;background:transparent}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:rgba(140,140,140,0.3);border-radius:10px}
+*::-webkit-scrollbar-button{display:none}
+html,body{width:100%;height:100%;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;transition:background 0.25s ease,color 0.25s ease}
+:root{
+  --bg:#000;--bg2:#0a0a0a;--bg3:#111;--bg4:#1a1a1a;
+  --border:#1f1f1f;--border2:#2a2a2a;
+  --text:#fff;--text2:#aaa;--text3:#888;--text4:#666;
+  --accent:#00d2ff;--accent2:#0099cc;
+  --like:#ff4466;--success:#00ff88;--gold:#ffaa00;
+  --hover:rgba(255,255,255,0.06);
+  --grad-top:linear-gradient(180deg,#0d0d0d 0%,#000 100%);
+  --sent-grad:linear-gradient(135deg,#00d2ff 0%,#0099cc 100%);
+  --sent-text:#000;
+  --overlay:rgba(0,0,0,0.75);
+}
+:root.light{
+  --bg:#fff;--bg2:#fafafa;--bg3:#f5f5f5;--bg4:#e5e5e5;
+  --border:#e5e5e5;--border2:#d5d5d5;
+  --text:#000;--text2:#555;--text3:#777;--text4:#999;
+  --accent:#0099cc;--accent2:#007aa3;
+  --like:#e0245e;--success:#00b368;--gold:#e09500;
+  --hover:rgba(0,0,0,0.04);
+  --grad-top:linear-gradient(180deg,#fafafa 0%,#fff 100%);
+  --sent-grad:linear-gradient(135deg,#0099cc 0%,#007aa3 100%);
+  --sent-text:#fff;
+  --overlay:rgba(0,0,0,0.5);
+}
+body{background:var(--bg);color:var(--text)}
+.app{width:100%;height:100%;display:flex;flex-direction:column;max-width:640px;margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
+
+/* ===== Top Bar ===== */
+.top-bar{height:56px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;background:var(--grad-top);border-bottom:1px solid var(--border);z-index:10}
+.sub-mini{display:flex;align-items:center;gap:10px;min-width:0;flex:1;overflow:hidden}
+.sub-icon{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,rgba(0,210,255,0.15) 0%,rgba(0,210,255,0.05) 100%);border:1px solid rgba(0,210,255,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sub-icon svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.sub-text{display:flex;flex-direction:column;line-height:1;min-width:0}
+.sub-title{font-size:14px;font-weight:800;letter-spacing:0.2px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub-desc{font-size:10px;font-weight:600;color:var(--text4);letter-spacing:1px;text-transform:uppercase;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top-sub-status{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.sub-renew-badge{display:flex;align-items:center;gap:6px;padding:7px 11px;background:linear-gradient(135deg,rgba(171,130,255,0.15) 0%,rgba(171,130,255,0.05) 100%);border:1px solid rgba(171,130,255,0.35);border-radius:20px;font-size:10px;font-weight:800;color:#ab82ff;letter-spacing:0.5px;text-transform:uppercase;white-space:nowrap}
+.sub-renew-badge svg{width:11px;height:11px;stroke:#ab82ff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ===== Page Container ===== */
+.page{flex:1;overflow-y:auto;padding:20px 16px 40px;-webkit-overflow-scrolling:touch;min-height:0}
+.page-inner{max-width:640px;margin:0 auto}
+
+/* ===== Plans Hero ===== */
+.plans-hero{position:relative;padding:24px 18px;border-radius:16px;background:radial-gradient(ellipse at top left, rgba(0,210,255,0.15) 0%, transparent 50%),radial-gradient(ellipse at bottom right, rgba(171,130,255,0.12) 0%, transparent 50%),linear-gradient(180deg,var(--bg3) 0%,var(--bg2) 100%);border:1px solid var(--border);margin-bottom:18px;overflow:hidden}
+.plans-hero::before{content:'';position:absolute;top:-50%;right:-20%;width:300px;height:300px;background:radial-gradient(circle, rgba(0,210,255,0.08) 0%, transparent 70%);pointer-events:none}
+.plans-hero-eyebrow{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(0,210,255,0.08);border:1px solid rgba(0,210,255,0.2);border-radius:20px;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.plans-hero-eyebrow .pulse{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}
+.plans-hero-title{font-size:22px;font-weight:800;color:var(--text);letter-spacing:-0.3px;line-height:1.2;margin-bottom:8px}
+.plans-hero-title span{background:linear-gradient(135deg,var(--accent) 0%,#ab82ff 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.plans-hero-desc{font-size:13px;color:var(--text2);line-height:1.5;letter-spacing:0.2px}
+
+/* ===== Plans Grid ===== */
+.plans-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-bottom:20px}
+.plan-card{position:relative;padding:20px;background:linear-gradient(180deg,var(--bg3) 0%,var(--bg2) 100%);border:1px solid var(--border);border-radius:16px;transition:all 0.25s ease;overflow:hidden;cursor:pointer}
+.plan-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.plan-card.selected{border-color:var(--accent);background:linear-gradient(180deg,rgba(0,210,255,0.06) 0%,var(--bg2) 100%)}
+.plan-card.featured{border-color:#ab82ff;background:linear-gradient(180deg,rgba(171,130,255,0.08) 0%,var(--bg2) 100%)}
+.plan-card.featured.selected{border-color:#ab82ff;box-shadow:0 0 0 1px #ab82ff, 0 8px 32px rgba(171,130,255,0.2)}
+.plan-card.featured::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#ab82ff 0%,var(--accent) 100%)}
+.plan-ribbon{position:absolute;top:14px;right:14px;padding:4px 10px;background:linear-gradient(135deg,#ab82ff 0%,#8a5ce0 100%);border-radius:10px;font-size:9px;font-weight:800;color:#fff;letter-spacing:0.8px;text-transform:uppercase}
+.plan-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+.plan-card.featured .plan-head{padding-right:70px}
+.plan-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.plan-icon svg{width:22px;height:22px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.plan-card[data-plan="basic"] .plan-icon{background:rgba(0,210,255,0.12);border:1px solid rgba(0,210,255,0.3)}
+.plan-card[data-plan="basic"] .plan-icon svg{stroke:var(--accent)}
+.plan-card[data-plan="pro"] .plan-icon{background:rgba(171,130,255,0.12);border:1px solid rgba(171,130,255,0.3)}
+.plan-card[data-plan="pro"] .plan-icon svg{stroke:#ab82ff}
+.plan-card[data-plan="elite"] .plan-icon{background:rgba(255,170,0,0.12);border:1px solid rgba(255,170,0,0.3)}
+.plan-card[data-plan="elite"] .plan-icon svg{stroke:var(--gold)}
+.plan-name{font-size:16px;font-weight:800;color:var(--text);letter-spacing:0.3px;margin-bottom:3px}
+.plan-tagline{font-size:11px;color:var(--text3);letter-spacing:0.2px}
+.plan-price{display:flex;align-items:baseline;gap:6px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.plan-price-currency{font-size:14px;font-weight:700;color:var(--text3)}
+.plan-price-amount{font-size:32px;font-weight:800;color:var(--text);line-height:1;letter-spacing:-0.5px;font-variant-numeric:tabular-nums}
+.plan-price-period{font-size:12px;color:var(--text4);font-weight:600}
+.plan-features{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.plan-feature{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--text);letter-spacing:0.2px;line-height:1.4}
+.plan-feature svg{width:16px;height:16px;flex-shrink:0;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.plan-feature.included svg{stroke:var(--success)}
+.plan-feature.excluded{color:var(--text4)}
+.plan-feature.excluded svg{stroke:var(--text4)}
+.plan-cta{width:100%;padding:13px 18px;background:rgba(255,255,255,0.04);border:1px solid var(--border2);border-radius:10px;color:var(--text);font-family:inherit;font-size:13px;font-weight:700;letter-spacing:0.3px;cursor:pointer;transition:all 0.2s ease;display:flex;align-items:center;justify-content:center;gap:8px}
+.plan-cta:active{transform:scale(0.98)}
+.plan-cta svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.plan-card[data-plan="basic"] .plan-cta{background:linear-gradient(180deg,var(--accent) 0%,var(--accent2) 100%);border-color:var(--accent);color:var(--sent-text)}
+.plan-card[data-plan="pro"] .plan-cta{background:linear-gradient(180deg,#ab82ff 0%,#8a5ce0 100%);border-color:#ab82ff;color:#000}
+.plan-card[data-plan="elite"] .plan-cta{background:linear-gradient(180deg,var(--gold) 0%,#cc8800 100%);border-color:var(--gold);color:#000}
+
+
+/* ============================================= */
+/* ===== DISCOUNT MODAL (Compact & Matching) ==== */
+/* ============================================= */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:var(--overlay);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  z-index:1000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  animation:fadeIn 0.25s ease;
+}
+.modal-overlay.active{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+.discount-modal{
+  position:relative;
+  width:100%;
+  max-width:380px;
+  background:linear-gradient(180deg,var(--bg3) 0%,var(--bg2) 100%);
+  border:1px solid var(--border2);
+  border-radius:18px;
+  overflow:hidden;
+  animation:slideUp 0.3s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow:0 20px 50px rgba(0,0,0,0.5);
+}
+@keyframes slideUp{from{transform:translateY(20px) scale(0.96);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+
+.discount-modal::before{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg, var(--gold) 0%, var(--accent) 50%, #ab82ff 100%);
+}
+
+.discount-modal-content{
+  padding:22px 20px;
+}
+
+.discount-close{
+  position:absolute;
+  top:12px;right:12px;
+  width:30px;height:30px;
+  border-radius:50%;
+  background:rgba(255,255,255,0.05);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;
+  transition:all 0.2s ease;
+  z-index:2;
+}
+.discount-close:hover{background:var(--hover);border-color:var(--border2)}
+.discount-close:active{transform:scale(0.9)}
+.discount-close svg{width:13px;height:13px;stroke:var(--text3);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+.discount-gift{
+  width:54px;height:54px;
+  margin:0 auto 12px;
+  border-radius:50%;
+  background:linear-gradient(135deg, rgba(255,170,0,0.15) 0%, rgba(255,170,0,0.05) 100%);
+  border:1px solid rgba(255,170,0,0.3);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+  animation:giftFloat 3s ease-in-out infinite;
+}
+@keyframes giftFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-4px)}
+}
+.discount-gift svg{
+  width:26px;height:26px;
+  stroke:var(--gold);
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.discount-offer-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  padding:4px 10px;
+  background:rgba(255,170,0,0.1);
+  border:1px solid rgba(255,170,0,0.25);
+  border-radius:20px;
+  font-size:9px;
+  font-weight:800;
+  color:var(--gold);
+  letter-spacing:1px;
+  text-transform:uppercase;
+  margin:0 auto 10px;
+  width:fit-content;
+}
+.discount-offer-badge svg{
+  width:10px;height:10px;
+  stroke:var(--gold);
+  fill:none;
+  stroke-width:2.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.discount-title{
+  text-align:center;
+  font-size:17px;
+  font-weight:800;
+  color:var(--text);
+  letter-spacing:-0.2px;
+  margin-bottom:6px;
+  line-height:1.25;
+}
+.discount-title span{
+  background:linear-gradient(135deg, var(--gold) 0%, #ff6b9d 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+.discount-desc{
+  text-align:center;
+  font-size:12px;
+  color:var(--text3);
+  line-height:1.5;
+  margin-bottom:14px;
+  padding:0 6px;
+}
+
+.discount-percent-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:14px;
+  padding:10px 12px;
+  background:rgba(255,170,0,0.05);
+  border:1px solid rgba(255,170,0,0.15);
+  border-radius:12px;
+}
+.discount-percent-icon{
+  width:32px;height:32px;
+  border-radius:8px;
+  background:linear-gradient(135deg, rgba(255,170,0,0.15) 0%, rgba(255,170,0,0.05) 100%);
+  border:1px solid rgba(255,170,0,0.25);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.discount-percent-icon svg{
+  width:16px;height:16px;
+  stroke:var(--gold);
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.discount-percent-text{flex:1;min-width:0}
+.discount-percent-label{
+  font-size:10px;
+  color:var(--text3);
+  font-weight:600;
+  letter-spacing:0.3px;
+  margin-bottom:1px;
+}
+.discount-percent-value{
+  font-size:14px;
+  font-weight:800;
+  color:var(--text);
+  letter-spacing:-0.2px;
+}
+.discount-percent-value span{
+  color:var(--gold);
+}
+
+.discount-field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom:14px;
+}
+.discount-label{
+  font-size:10px;
+  font-weight:700;
+  color:var(--text3);
+  letter-spacing:0.8px;
+  text-transform:uppercase;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+.discount-label svg{
+  width:11px;height:11px;
+  stroke:var(--accent);
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+.discount-input-wrap{position:relative}
+.discount-input{
+  width:100%;
+  padding:11px 14px 11px 38px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  border-radius:10px;
+  color:var(--text);
+  font-family:inherit;
+  font-size:13px;
+  font-weight:600;
+  letter-spacing:0.8px;
+  text-transform:uppercase;
+  outline:none;
+  transition:all 0.2s ease;
+}
+.discount-input::placeholder{
+  color:var(--text4);
+  text-transform:none;
+  letter-spacing:0.3px;
+  font-weight:500;
+}
+.discount-input:focus{
+  border-color:var(--gold);
+  background:var(--bg2);
+  box-shadow:0 0 0 3px rgba(255,170,0,0.1);
+}
+.discount-input-icon{
+  position:absolute;
+  left:12px;top:50%;
+  transform:translateY(-50%);
+  width:16px;height:16px;
+  pointer-events:none;
+}
+.discount-input-icon svg{
+  width:16px;height:16px;
+  stroke:var(--text4);
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.discount-actions{
+  display:flex;
+  gap:8px;
+}
+.discount-btn{
+  flex:1;
+  padding:11px 14px;
+  border-radius:10px;
+  font-family:inherit;
+  font-size:12px;
+  font-weight:800;
+  letter-spacing:0.4px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all 0.2s ease;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+}
+.discount-btn:active{transform:scale(0.97)}
+.discount-btn-skip{
+  background:var(--bg);
+  border:1px solid var(--border);
+  color:var(--text2);
+}
+.discount-btn-skip:hover{
+  background:var(--hover);
+  border-color:var(--border2);
+}
+.discount-btn-apply{
+  background:linear-gradient(180deg,var(--gold) 0%,#cc8800 100%);
+  border:1px solid var(--gold);
+  color:#000;
+}
+.discount-btn-apply:hover{
+  background:linear-gradient(180deg,#ffb820 0%,#dd9900 100%);
+}
+.discount-btn svg{
+  width:13px;height:13px;
+  stroke:currentColor;
+  fill:none;
+  stroke-width:2.5;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.discount-hint{
+  text-align:center;
+  font-size:10px;
+  color:var(--text4);
+  margin-top:12px;
+  letter-spacing:0.2px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+}
+.discount-hint svg{
+  width:10px;height:10px;
+  stroke:var(--text4);
+  fill:none;
+  stroke-width:2;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  flex-shrink:0;
+}
+
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-6px)}
+  75%{transform:translateX(6px)}
+}
+
+/* ===== Chat Overlay (QXHub-style) ===== */
+.chat-overlay{
+  position:fixed;inset:0;width:100%;height:100%;height:100dvh;
+  background:var(--bg);
+  z-index:200;
+  display:flex;flex-direction:column;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.2s ease;
+  overflow:hidden;
+  overscroll-behavior:contain;
+  touch-action:none;
+  --kb-height:0px;
+}
+.chat-overlay.visible{opacity:1;pointer-events:auto}
+
+.chat-header{
+  position:relative;
+  display:flex;align-items:center;gap:12px;
+  padding:10px 12px;
+  padding-top:calc(10px + env(safe-area-inset-top,0px));
+  border-bottom:1px solid var(--border);
+  background:var(--bg);
+  flex:0 0 auto;
+  min-height:56px;
+  z-index:5;
+}
+.chat-back{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;color:var(--text);cursor:pointer;border-radius:50%;flex-shrink:0;transition:background 0.15s ease,transform 0.1s ease}
+.chat-back:hover{background:var(--hover)}
+.chat-back:active{transform:scale(0.9)}
+.chat-back svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chat-user-info{flex:1;min-width:0;display:flex;align-items:center;gap:10px;overflow:hidden}
+.chat-user-details{flex:1;min-width:0;overflow:hidden}
+.chat-user-name{font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-user-status{font-size:11px;margin-top:1px;display:flex;align-items:center;gap:5px}
+.chat-user-status .dot{width:6px;height:6px;border-radius:50%;background:var(--success);box-shadow:0 0 6px var(--success)}
+.chat-menu-btn{width:36px;height:36px;display:flex;align-items:center;justify-content:center;background:transparent;border:none;color:var(--text);cursor:pointer;border-radius:50%;flex-shrink:0;transition:background 0.15s ease,transform 0.15s ease}
+.chat-menu-btn:hover{background:var(--hover)}
+.chat-menu-btn:active{transform:scale(0.85)}
+.chat-menu-btn svg{width:20px;height:20px;stroke:currentColor;fill:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+.chat-messages{
+  flex:1 1 auto;
+  min-height:0;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding:16px;
+  display:flex;flex-direction:column;gap:8px;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+}
+
+.chat-message{
+  max-width:78%;
+  padding:9px 13px;
+  border-radius:18px;
+  font-size:14px;
+  line-height:1.4;
+  word-wrap:break-word;
+  flex-shrink:0;
+  animation:msgIn 0.25s ease;
+}
+@keyframes msgIn{from{opacity:0;transform:translateY(6px) scale(0.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+.chat-message.sent{
+  align-self:flex-end;
+  background:var(--sent-grad);
+  color:var(--sent-text);
+  border-bottom-right-radius:4px;
+}
+.chat-message.received{
+  align-self:flex-start;
+  background:var(--bg3);
+  color:var(--text);
+  border-bottom-left-radius:4px;
+  border:1px solid var(--border);
+}
+.chat-message img{
+  max-width:100%;
+  border-radius:12px;
+  display:block;
+  margin-bottom:4px;
+}
+.chat-message-time{font-size:10px;opacity:0.7;margin-top:3px}
+
+/* ===== Payment Method Options ===== */
+.chat-message.has-options{max-width:92%}
+.chat-options{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.chat-option-btn{
+  display:flex;align-items:center;gap:10px;width:100%;
+  padding:10px 12px;background:var(--bg4);border:1px solid var(--border2);
+  border-radius:12px;cursor:pointer;color:var(--text);
+  font-size:13.5px;font-weight:600;text-align:left;
+  transition:all 0.15s ease;font-family:inherit;
+}
+.chat-option-btn:hover{border-color:var(--accent);background:var(--hover);box-shadow:0 0 0 1px rgba(0,210,255,0.2)}
+.chat-option-btn:active{transform:scale(0.98)}
+.pay-badge{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:800;letter-spacing:-0.5px;flex-shrink:0;
+  text-transform:uppercase;
+}
+.pay-badge.binance{background:#F3BA2F;color:#1A1A1A}
+.pay-badge.trc20{background:#EF0027;color:#fff}
+.pay-badge.bep20{background:#F3BA2F;color:#1A1A1A}
+
+/* Real brand icons (BNB / Tron / BSC) loaded from CDN */
+.pay-icon-wrap{
+  width:32px;height:32px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border-radius:50%;overflow:hidden;
+  background:rgba(255,255,255,0.04);
+}
+.pay-icon-wrap img{
+  width:100%;height:100%;display:block;
+  object-fit:contain;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+}
+.pay-icon-wrap svg{
+  width:100%;height:100%;display:block;
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,0.25));
+}
+.chat-option-info{flex:1;min-width:0;display:flex;flex-direction:column}
+.chat-option-title{font-weight:700;font-size:13.5px;color:var(--text)}
+.chat-option-sub{font-size:10.5px;color:var(--text3);margin-top:1px}
+.chat-option-arrow{color:var(--text3);flex-shrink:0;display:flex;align-items:center}
+.chat-option-arrow svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== Payment Instruction Card ===== */
+.chat-message.card{padding:0;background:transparent;border:none;max-width:92%}
+.chat-message.card .chat-message-time{padding:0 4px;margin-top:6px;align-self:flex-end;width:100%;text-align:right}
+.chat-card{
+  border-radius:14px;background:var(--bg3);
+  border:1px solid var(--border2);overflow:hidden;
+}
+.chat-card-header{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 12px;
+  background:linear-gradient(135deg,rgba(0,210,255,0.08),rgba(0,153,204,0.02));
+  border-bottom:1px solid var(--border);
+}
+.chat-card-header .pay-badge{width:28px;height:28px;font-size:9px;border-radius:7px}
+.chat-card-header .pay-icon-wrap{width:24px;height:24px}
+.chat-card-title{font-weight:700;font-size:13.5px;color:var(--text)}
+.chat-card-body{padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.chat-card-row{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  padding:8px 10px;background:var(--bg2);border:1px solid var(--border);
+  border-radius:8px;
+}
+.chat-card-row-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;flex-shrink:0;font-weight:600}
+.chat-card-row-value{
+  font-size:11.5px;font-weight:600;color:var(--text);
+  font-family:'Sarasa Mono SC','Courier New',monospace;
+  word-break:break-all;text-align:right;max-width:60%;
+}
+.chat-card-row-actions{display:flex;align-items:center;gap:6px;min-width:0}
+.chat-card-copy{
+  background:transparent;border:none;color:var(--accent);
+  cursor:pointer;padding:4px 6px;border-radius:6px;flex-shrink:0;
+  transition:background 0.15s ease;display:flex;align-items:center;
+}
+.chat-card-copy:hover{background:var(--hover)}
+.chat-card-copy svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chat-card-hint{
+  font-size:11px;color:var(--text2);line-height:1.5;
+  padding:8px 10px;background:rgba(0,210,255,0.04);
+  border:1px dashed rgba(0,210,255,0.25);border-radius:8px;
+}
+.chat-card-hint b{color:var(--accent);font-weight:700}
+
+/* ===== Summary Rows (Plan / Discount) ===== */
+.chat-card-row.summary{background:rgba(0,210,255,0.04);border-color:rgba(0,210,255,0.2)}
+.chat-card-row.summary .chat-card-row-label{color:var(--accent)}
+.chat-card-row.summary .chat-card-row-value{color:var(--text);font-family:inherit;font-size:12.5px}
+.chat-card-row.discount{background:rgba(255,170,0,0.05);border-color:rgba(255,170,0,0.25)}
+.chat-card-row.discount .chat-card-row-label{color:var(--gold)}
+.chat-card-row.discount .chat-card-row-value{color:var(--gold);font-family:inherit;font-size:12.5px}
+
+/* ===== Payment Confirmation Button (I've Paid) ===== */
+.chat-card-cta{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;padding:11px 14px;margin-top:6px;
+  border:none;border-radius:10px;
+  background:linear-gradient(180deg,#00cc6a 0%,#00994f 100%);
+  color:#fff;font-weight:700;font-size:13.5px;
+  cursor:pointer;font-family:inherit;
+  transition:all 0.2s ease;
+}
+.chat-card-cta:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,204,106,0.3)}
+.chat-card-cta:active{transform:translateY(0) scale(0.98)}
+.chat-card-cta:disabled{cursor:not-allowed;transform:none}
+.chat-card-cta svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+/* Submitted state: button is disabled and visually muted */
+.chat-card-cta.submitted{
+  background:var(--bg4);color:var(--text3);
+  border:1px solid var(--border2);
+}
+/* Disabled (Verify before image uploaded): same look as submitted */
+.chat-card-cta:disabled{
+  background:var(--bg4);color:var(--text3);
+  border:1px solid var(--border2);
+}
+
+/* ===== Image Upload Flow (for TRC20/BEP20 payment proofs) ===== */
+.chat-card-upload-flow{
+  margin-top:6px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.upload-zone{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:14px 12px;
+  background:var(--bg2);
+  border:2px dashed var(--border2);
+  border-radius:10px;
+  cursor:pointer;
+  transition:all 0.15s ease;
+  text-align:center;
+}
+.upload-zone:hover{
+  border-color:var(--accent);
+  background:rgba(0,210,255,0.04);
+}
+.upload-zone .upload-icon{
+  width:24px;height:24px;
+  stroke:var(--accent);fill:none;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;
+  margin-bottom:4px;
+}
+.upload-text{font-size:12px;font-weight:600;color:var(--text)}
+.upload-sub{font-size:10px;color:var(--text3);margin-top:2px}
+.upload-preview{
+  position:relative;
+  border:1px solid var(--border2);
+  border-radius:10px;
+  overflow:hidden;
+  background:var(--bg2);
+}
+.upload-preview img{
+  display:block;width:100%;max-height:220px;object-fit:contain;
+}
+.upload-remove{
+  position:absolute;top:8px;right:8px;
+  width:26px;height:26px;border-radius:50%;
+  background:rgba(0,0,0,0.7);color:#fff;
+  border:none;cursor:pointer;font-size:18px;line-height:1;
+  display:flex;align-items:center;justify-content:center;
+  padding:0;font-weight:400;
+}
+.upload-remove:hover{background:rgba(0,0,0,0.85)}
+
+.chat-input-area{
+  position:relative;
+  display:flex;align-items:flex-end;gap:8px;
+  padding:10px 12px;
+  padding-bottom:calc(10px + env(safe-area-inset-bottom,0px) + var(--kb-height,0px));
+  border-top:1px solid var(--border);
+  background:var(--bg);
+  flex:0 0 auto;
+  z-index:5;
+}
+.chat-input{
+  flex:1;
+  min-height:40px;
+  max-height:120px;
+  padding:10px 14px;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:20px;
+  color:var(--text);
+  font-family:inherit;font-size:15px;line-height:1.4;
+  outline:none;resize:none;
+  overflow-y:auto;
+  word-wrap:break-word;word-break:break-word;
+  -webkit-appearance:none;
+}
+.chat-input:focus{border-color:var(--accent)}
+.chat-input::placeholder{color:var(--text4)}
+.chat-attach-btn{
+  width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  border-radius:50%;
+  cursor:pointer;flex-shrink:0;
+  align-self:flex-end;
+  transition:background 0.15s ease,transform 0.15s ease;
+}
+.chat-attach-btn:hover{background:var(--bg4)}
+.chat-attach-btn:active{transform:scale(0.9)}
+.chat-attach-btn svg{width:18px;height:18px;stroke:var(--text3);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.chat-send-btn{
+  width:40px;height:40px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--sent-grad);
+  border:none;border-radius:50%;
+  cursor:pointer;flex-shrink:0;
+  align-self:flex-end;
+  transition:transform 0.15s ease,opacity 0.15s ease;
+}
+.chat-send-btn:active{transform:scale(0.88)}
+.chat-send-btn:disabled{opacity:0.4;cursor:not-allowed}
+.chat-send-btn svg{width:18px;height:18px;stroke:var(--sent-text);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+.chat-image-preview{
+  display:none;
+  padding:8px 14px;
+  background:var(--bg2);
+  border-top:1px solid var(--border);
+  align-items:center;gap:10px;
+  flex:0 0 auto;
+}
+.chat-image-preview.active{display:flex}
+.chat-image-preview img{width:60px;height:60px;border-radius:8px;object-fit:cover;border:1px solid var(--border2)}
+.chat-image-preview-info{flex:1;min-width:0}
+.chat-image-preview-name{font-size:11px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-image-preview-size{font-size:9px;color:var(--text4);margin-top:2px}
+.chat-image-preview-remove{width:28px;height:28px;border-radius:6px;background:rgba(255,68,102,0.1);border:1px solid rgba(255,68,102,0.3);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s ease}
+.chat-image-preview-remove:hover{background:rgba(255,68,102,0.2)}
+.chat-image-preview-remove svg{width:14px;height:14px;stroke:var(--like);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* ===== FAQ ===== */
+.section-title{font-size:12px;font-weight:700;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.section-title::before{content:'';width:3px;height:14px;background:linear-gradient(180deg,var(--accent),var(--accent2));border-radius:2px}
+.faq-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.faq-item{background:linear-gradient(180deg,var(--bg3) 0%,var(--bg2) 100%);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color 0.2s ease}
+.faq-item:hover{border-color:var(--border2)}
+.faq-item.open{border-color:var(--accent)}
+.faq-q{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;font-size:13px;font-weight:700;color:var(--text);letter-spacing:0.2px}
+.faq-q svg{width:16px;height:16px;stroke:var(--accent);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;transition:transform 0.25s ease;flex-shrink:0}
+.faq-item.open .faq-q svg{transform:rotate(180deg)}
+.faq-a{max-height:0;overflow:hidden;transition:max-height 0.3s ease}
+.faq-a-inner{padding:0 16px 14px;font-size:12px;color:var(--text2);line-height:1.6;letter-spacing:0.2px}
+
+/* ===== Footer Note ===== */
+.footer-note{text-align:center;padding:20px;font-size:11px;color:var(--text4);letter-spacing:0.3px;line-height:1.6}
+.footer-note a{color:var(--accent);text-decoration:none;font-weight:600}
+.footer-note a:hover{text-decoration:underline}
+
+/* ===== Toast ===== */
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);padding:10px 18px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:12px;font-weight:600;opacity:0;pointer-events:none;transition:all 0.25s ease;z-index:300;max-width:90%;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,0.3);display:flex;align-items:center;gap:6px}
+#toast.visible{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+
+/* ===== Responsive ===== */
+@media (max-width:480px){
+  .top-bar{padding:0 12px}
+  .sub-icon{width:34px;height:34px}
+  .sub-icon svg{width:17px;height:17px}
+  .sub-title{font-size:13px}
+  .sub-desc{font-size:9px;margin-top:2px}
+  .sub-renew-badge{padding:6px 9px;font-size:9px;gap:5px}
+  .sub-renew-badge svg{width:10px;height:10px}
+  .plans-hero{padding:20px 16px;margin-bottom:16px}
+  .plans-hero-title{font-size:20px}
+  .plans-hero-desc{font-size:12px}
+  .plans-hero-eyebrow{font-size:9px;padding:4px 10px}
+  .plan-card{padding:18px}
+  .plan-head{gap:12px}
+  .plan-card.featured .plan-head{padding-right:65px}
+  .plan-icon{width:40px;height:40px}
+  .plan-icon svg{width:20px;height:20px}
+  .plan-name{font-size:15px}
+  .plan-tagline{font-size:10px}
+  .plan-price-amount{font-size:28px}
+  .plan-price-period{font-size:11px}
+  .plan-features{gap:9px}
+  .plan-feature{font-size:11.5px;gap:8px}
+  .plan-feature svg{width:15px;height:15px}
+  .plan-cta{padding:12px 16px;font-size:12.5px}
+  .plan-ribbon{font-size:8px;padding:3px 8px;top:12px;right:12px}
+  .faq-q{padding:12px 14px;font-size:12.5px}
+  .faq-a-inner{padding:0 14px 12px;font-size:11.5px}
+  .footer-note{font-size:10px;padding:16px}
+  
+  .discount-modal{max-width:360px}
+  .discount-modal-content{padding:20px 18px}
+  .discount-gift{width:48px;height:48px}
+  .discount-gift svg{width:24px;height:24px}
+  .discount-title{font-size:16px}
+  .discount-desc{font-size:11.5px;margin-bottom:12px}
+  .discount-percent-row{padding:9px 10px;gap:9px}
+  .discount-percent-icon{width:30px;height:30px}
+  .discount-percent-icon svg{width:15px;height:15px}
+  .discount-percent-value{font-size:13px}
+  .discount-percent-label{font-size:9px}
+  .discount-input{padding:10px 12px 10px 36px;font-size:12.5px}
+  .discount-input-icon{left:11px}
+  .discount-input-icon svg{width:14px;height:14px}
+  .discount-btn{padding:10px 12px;font-size:11.5px}
+  .discount-hint{font-size:9px;margin-top:10px}
+  
+  .chat-header{padding:10px 12px;min-height:56px}
+  .chat-user-name{font-size:14px}
+  .chat-messages{padding:12px}
+  .chat-message{max-width:82%;font-size:13.5px;padding:8px 12px}
+  .chat-input-area{padding:10px 12px}
+  .chat-input{font-size:14.5px;padding:9px 13px}
+  .chat-attach-btn{width:38px;height:38px}
+  .chat-send-btn{width:38px;height:38px}
+}
+
+@media (max-width:360px){
+  .top-bar{padding:0 10px}
+  .sub-icon{width:32px;height:32px}
+  .sub-icon svg{width:16px;height:16px}
+  .sub-title{font-size:12px}
+  .sub-desc{font-size:8px}
+  .sub-renew-badge{padding:5px 8px;font-size:8px;gap:4px}
+  .sub-renew-badge svg{width:9px;height:9px}
+  .plans-hero-title{font-size:18px}
+  .plan-card{padding:16px}
+  .plan-price-amount{font-size:26px}
+  .discount-modal-content{padding:18px 16px}
+  .discount-gift{width:44px;height:44px}
+  .discount-gift svg{width:22px;height:22px}
+  .discount-title{font-size:15px}
+  .discount-actions{flex-direction:column}
+  .discount-btn{padding:10px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <div class="sub-mini">
+      <div class="sub-icon">
+        <svg viewBox="0 0 24 24"><path d="M20 7h-4V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M10 11v6M14 11v6"/></svg>
+      </div>
+      <div class="sub-text">
+        <div class="sub-title">Subscriptions</div>
+        <div class="sub-desc">Manage your plan</div>
+      </div>
+    </div>
+    <div class="top-sub-status">
+      <div class="sub-renew-badge">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>Renews in 12d</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plans Page -->
+  <div class="page">
+    <div class="page-inner">
+
+      <!-- Hero -->
+      <div class="plans-hero">
+        <div class="plans-hero-eyebrow">
+          <span class="pulse"></span>
+          <span>Subscription Plans</span>
+        </div>
+        <div class="plans-hero-title">Choose your <span>trading edge</span></div>
+        <div class="plans-hero-desc">Unlock premium signals, advanced strategies, and real-time market intelligence. Cancel anytime.</div>
+      </div>
+
+      <!-- Plans Grid -->
+      <div class="plans-grid" id="plansGrid">
+
+        <!-- Basic Plan -->
+        <div class="plan-card" data-plan="basic">
+          <div class="plan-head">
+            <div class="plan-icon">
+              <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            </div>
+            <div>
+              <div class="plan-name">Basic</div>
+              <div class="plan-tagline">For new traders getting started</div>
+            </div>
+          </div>
+          <div class="plan-price">
+            <span class="plan-price-currency">$</span>
+            <span class="plan-price-amount">50</span>
+            <span class="plan-price-period">/ month</span>
+          </div>
+          <div class="plan-features">
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Up to 100 signals per month</span></div>
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Strong strategy access</span></div>
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Telegram bot integration</span></div>
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Basic trade history (30 days)</span></div>
+            <div class="plan-feature excluded"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span>Pro & Medium strategies</span></div>
+            <div class="plan-feature excluded"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg><span>Priority support</span></div>
+          </div>
+          <button class="plan-cta" onclick="openPurchaseModal('basic')"><span>Choose Basic</span></button>
+        </div>
+
+        <!-- Pro Plan (Featured) -->
+        <div class="plan-card featured selected" data-plan="pro">
+          <div class="plan-ribbon">Most Popular</div>
+          <div class="plan-head">
+            <div class="plan-icon">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+            </div>
+            <div>
+              <div class="plan-name">Pro</div>
+              <div class="plan-tagline">For serious active traders</div>
+            </div>
+          </div>
+          <div class="plan-price">
+            <span class="plan-price-currency">$</span>
+            <span class="plan-price-amount">75</span>
+            <span class="plan-price-period">/ month</span>
+          </div>
+          <div class="plan-features">
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Up to 500 signals per month</span></div>
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>All strategies (Strong, Medium, Pro)</span></div>
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Advanced analytics dashboard</span></div>
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Full trade history (unlimited)</span></div>
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Priority 24/7 support</span></div>
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Multi-exchange support</span></div>
+          </div>
+          <button class="plan-cta" onclick="openPurchaseModal('pro')">
+            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8"/></svg>
+            <span>Choose Pro</span>
+          </button>
+        </div>
+
+        <!-- Elite Plan -->
+        <div class="plan-card" data-plan="elite">
+          <div class="plan-head">
+            <div class="plan-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            </div>
+            <div>
+              <div class="plan-name">Elite</div>
+              <div class="plan-tagline">For professional institutions</div>
+            </div>
+          </div>
+          <div class="plan-price">
+            <span class="plan-price-currency">$</span>
+            <span class="plan-price-amount">100</span>
+            <span class="plan-price-period">/ month</span>
+          </div>
+          <div class="plan-features">
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Unlimited signals</span></div>
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Everything in Pro</span></div>
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Custom strategy builder</span></div>
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>API access & webhooks</span></div>
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Dedicated account manager</span></div>
+            <div class="plan-feature included"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>White-label solution</span></div>
+          </div>
+          <button class="plan-cta" onclick="openPurchaseModal('elite')">
+            <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            <span>Choose Elite</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- FAQ -->
+      <div class="section-title">Frequently Asked Questions</div>
+      <div class="faq-list">
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)"><span>Can I change my plan later?</span><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+          <div class="faq-a"><div class="faq-a-inner">Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate any unused balance to your new plan.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)"><span>What payment methods do you accept?</span><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+          <div class="faq-a"><div class="faq-a-inner">We accept all major credit cards (Visa, Mastercard, Amex), PayPal, and cryptocurrency (BTC, ETH, USDT). All payments are processed securely.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)"><span>Is there a free trial available?</span><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+          <div class="faq-a"><div class="faq-a-inner">Yes! Every new account gets a 7-day free trial of the Pro plan with full access to all features. No credit card required to start.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)"><span>How does the money-back guarantee work?</span><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+          <div class="faq-a"><div class="faq-a-inner">If you're not satisfied within the first 30 days of any paid plan, contact our support team for a full refund. No questions asked.</div></div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)"><span>Can I cancel my subscription anytime?</span><svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+          <div class="faq-a"><div class="faq-a-inner">Absolutely. You can cancel your subscription at any time from your account settings. You'll continue to have access until the end of your current billing period.</div></div>
+        </div>
+      </div>
+
+      <!-- Footer Note -->
+      <div class="footer-note">
+        All prices are in USD. Taxes may apply based on your region.<br>
+        Need help? <a href="#" onclick="openChat(); return false;">Contact our sales team</a>
+      </div>
+
+    </div>
+  </div>
+
+
+</div>
+
+<!-- ===== DISCOUNT MODAL ===== -->
+<div class="modal-overlay" id="purchaseModal">
+  <div class="discount-modal">
+    <div class="discount-modal-content">
+      <div class="discount-close" onclick="closePurchaseModal()">
+        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </div>
+      
+      <!-- Gift Icon -->
+      <div class="discount-gift">
+        <svg viewBox="0 0 24 24">
+          <polyline points="20 12 20 22 4 22 4 12"/>
+          <rect x="2" y="7" width="20" height="5"/>
+          <line x1="12" y1="22" x2="12" y2="7"/>
+          <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z"/>
+          <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z"/>
+        </svg>
+      </div>
+      
+      <!-- Offer Badge -->
+      <div class="discount-offer-badge">
+        <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+        <span>Exclusive Offer</span>
+      </div>
+      
+      <!-- Title -->
+      <div class="discount-title">Get Your <span>Special Discount</span></div>
+      
+      <!-- Description -->
+      <div class="discount-desc">Have a promo code? Apply it below to unlock exclusive savings on your subscription.</div>
+      
+      <!-- Discount Percent Display -->
+      <div class="discount-percent-row">
+        <div class="discount-percent-icon">
+          <svg viewBox="0 0 24 24"><line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+        </div>
+        <div class="discount-percent-text">
+          <div class="discount-percent-label">Save up to</div>
+          <div class="discount-percent-value"><span>50% OFF</span> your first month</div>
+        </div>
+      </div>
+      
+      <!-- Input Field -->
+      <div class="discount-field">
+        <div class="discount-label">
+          <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span>Promo Code</span>
+        </div>
+        <div class="discount-input-wrap">
+          <div class="discount-input-icon">
+            <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+          </div>
+          <input type="text" class="discount-input" id="discountCodeInput" placeholder="Enter your code here..." autocomplete="off">
+        </div>
+      </div>
+      
+      <!-- Action Buttons -->
+      <div class="discount-actions">
+        <button class="discount-btn discount-btn-skip" onclick="skipDiscount()">
+          <svg viewBox="0 0 24 24"><polyline points="13 17 18 12 13 7"/><polyline points="6 17 11 12 6 7"/></svg>
+          <span>Skip</span>
+        </button>
+        <button class="discount-btn discount-btn-apply" onclick="applyDiscount()">
+          <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Apply Code</span>
+        </button>
+      </div>
+      
+      <!-- Hint -->
+      <div class="discount-hint">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <span>Don't have a code? Skip to continue with support</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Chat Overlay -->
+<div class="chat-overlay" id="chatOverlay">
+  <div class="chat-header">
+    <button class="chat-back" id="chatBack"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+    <div class="chat-user-info">
+      <div class="chat-user-details">
+        <div class="chat-user-name">Crypto Payments</div>
+        <div class="chat-user-status">
+          <span class="dot"></span>
+          <span>Online</span>
+        </div>
+      </div>
+    </div>
+    <button class="chat-menu-btn" id="chatMenuBtn"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></button>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-image-preview" id="imagePreview">
+    <img id="previewImage" src="" alt="Preview">
+    <div class="chat-image-preview-info">
+      <div class="chat-image-preview-name" id="imageName">image.jpg</div>
+      <div class="chat-image-preview-size" id="imageSize">0 KB</div>
+    </div>
+    <div class="chat-image-preview-remove" onclick="removeImage()">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+  </div>
+  <div class="chat-input-area">
+    <button class="chat-attach-btn" onclick="document.getElementById('imageInput').click()">
+      <svg viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+    </button>
+    <input type="file" id="imageInput" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
+    <textarea class="chat-input" id="chatInput" placeholder="Type a message..." rows="1" autocomplete="off"></textarea>
+    <button class="chat-send-btn" id="chatSendBtn" tabindex="-1">
+      <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+    </button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+/* ===== SVG Icons (for messages) ===== */
+const ICONS = {
+  wave: '<svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;display:inline-block" viewBox="0 0 24 24"><path d="M7 11l-4 4 4 4"/><path d="M17 11l4 4-4 4"/><path d="M14 4l-4 16"/></svg>',
+  bulb: '<svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;display:inline-block" viewBox="0 0 24 24"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z"/></svg>',
+  check: '<svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;display:inline-block" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+  sparkles: '<svg style="width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:middle;display:inline-block" viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 10l-5.8 1.9L12 18l-1.9-5.8L4 10l5.8-1.9z"/></svg>'
+};
+
+/* ===== Payment Configuration =====
+   NOTE: Replace placeholder values with your real wallet addresses / Binance Pay ID.
+   The verification code is generated client-side (simulating a database-generated code).
+   To use a real backend, replace `generateCode()` with a fetch() call to your API.
+   Brand icons are loaded from official/CDN sources (real SVG logos).
+*/
+const PAYMENT_CONFIG = {
+  binance:{
+    label:'Binance Pay',
+    // BNB Coin (Binance Coin) official logo from bnb-chain repo
+    iconHtml:'<img src="https://raw.githubusercontent.com/bnb-chain/wallet-assets/master/assets/BNB/logo.svg" alt="BNB" width="32" height="32" loading="lazy" onerror="this.style.display=\'none\'">',
+    subtitle:'Pay via Binance Pay ID',
+    payUser:'YOUR_BINANCE_PAY_ID'  // ← ضع هنا يوزر Binance Pay الخاص بك
+  },
+  trc20:{
+    label:'USDT TRC20',
+    // TRON network official branded logo
+    iconHtml:'<img src="https://cdn.jsdelivr.net/gh/GMWalletApp/crypto-icons@latest/assets/networks/branded/tron.svg" alt="TRC-20" width="32" height="32" loading="lazy" onerror="this.style.display=\'none\'">',
+    subtitle:'USDT on TRON network',
+    wallet:'TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'  // ← ضع هنا عنوان TRC20
+  },
+  bep20:{
+    label:'USDT BEP20',
+    // BNB Smart Chain (BEP-20) official branded logo
+    iconHtml:'<img src="https://cdn.jsdelivr.net/gh/GMWalletApp/crypto-icons@latest/assets/networks/branded/binance-smart-chain.svg" alt="BEP-20" width="32" height="32" loading="lazy" onerror="this.style.display=\'none\'">',
+    subtitle:'USDT on BSC network',
+    wallet:'0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'  // ← ضع هنا عنوان BEP20
+  }
+};
+
+/* ===== Plan Info (for auto-display in payment card) ===== */
+const PLAN_INFO = {
+  basic: {name:'Basic', price:'$50/mo'},
+  pro:   {name:'Pro',   price:'$75/mo'},
+  elite: {name:'Elite', price:'$100/mo'}
+};
+
+/* ===== Discount Code Database (simulated) =====
+   Replace `validateDiscountCode()` with a real fetch() to your backend in production.
+*/
+const DISCOUNT_DB = {
+  'SAVE10':    {percent:10,  label:'10% off'},
+  'WELCOME20': {percent:20,  label:'20% off'},
+  'PRO50':     {percent:50,  label:'50% off'},
+  'VIP100':    {percent:100, label:'100% off'}
+};
+function validateDiscountCode(code){
+  // Simulates a database lookup. Returns the discount object or null.
+  // Replace with: fetch('/api/validate-discount?code='+code).then(r=>r.json())
+  if(!code) return null;
+  const found = DISCOUNT_DB[code.toUpperCase()];
+  return found ? {code:code.toUpperCase(), percent:found.percent, label:found.label} : null;
+}
+
+/* ===== State ===== */
+const State = {
+  selectedPlan:'pro',
+  currentPurchasePlan:null,        // plan in currently-open modal (null when closed)
+  selectedPlanForPurchase:null,   // plan the user clicked "Choose" on — persists after modal closes so the payment card knows which plan was selected
+  uploadedImage:null,
+  chatMessages:[],
+  supportFollowUpTimer:null,
+  selectedPaymentMethod:null,
+  appliedDiscount:null  // {code, percent, label} or null
+};
+
+/* ===== Toast ===== */
+let toastTimer = null;
+function showToast(msg, icon){
+  let t = document.getElementById('toast');
+  t.innerHTML = (icon || '') + '<span>' + msg + '</span>';
+  t.classList.add('visible');
+  if(toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('visible'), 2000);
+}
+
+/* ===== Time helper ===== */
+function nowTime(){
+  const n = new Date();
+  return n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');
+}
+
+/* ===== Purchase Modal ===== */
+function openPurchaseModal(planId){
+  State.currentPurchasePlan = planId;
+  State.selectedPlanForPurchase = planId;  // remember which plan button the user clicked, even after the modal closes
+  State.appliedDiscount = null;  // reset on fresh open
+  document.getElementById('purchaseModal').classList.add('active');
+  document.getElementById('discountCodeInput').value = '';
+  setTimeout(()=>document.getElementById('discountCodeInput').focus(), 300);
+}
+function closePurchaseModal(){
+  document.getElementById('purchaseModal').classList.remove('active');
+  State.currentPurchasePlan = null;
+}
+
+/* Reset chat state when the user starts a new purchase (clicks "Choose [Plan]"
+   then either skips the discount modal or applies a valid code).
+   This ensures the "Select a payment method" intro + buttons are re-sent fresh
+   every single time the user enters the chat via the purchase flow. */
+function resetChatForNewPurchase(){
+  // Clear previous chat history so openChat() re-pushes the intro with payment buttons
+  State.chatMessages = [];
+  State.selectedPaymentMethod = null;
+  // Clear any pending chat-input image attachment (paperclip)
+  if(State.uploadedImage){
+    State.uploadedImage = null;
+    const preview = document.getElementById('imagePreview');
+    if(preview) preview.classList.remove('active');
+  }
+}
+function skipDiscount(){
+  State.appliedDiscount = null;  // no discount when skipping
+  closePurchaseModal();
+  resetChatForNewPurchase();  // start a fresh chat so payment buttons are re-sent
+  openChat();
+}
+function applyDiscount(){
+  const inputEl = document.getElementById('discountCodeInput');
+  const code = inputEl.value.trim();
+  if(!code){
+    showToast('Please enter a discount code');
+    inputEl.style.borderColor = 'var(--like)';
+    inputEl.style.animation = 'shake 0.4s ease';
+    setTimeout(()=>{ inputEl.style.borderColor = ''; inputEl.style.animation = ''; }, 500);
+    return;
+  }
+  
+  // Show "Verifying..." state on the Apply button
+  const applyBtn = document.querySelector('.discount-btn-apply');
+  const applyBtnSpan = applyBtn.querySelector('span');
+  const originalText = applyBtnSpan.textContent;
+  applyBtnSpan.textContent = 'Verifying...';
+  applyBtn.style.opacity = '0.7';
+  applyBtn.style.pointerEvents = 'none';
+  
+  // Simulate database lookup (replace with real fetch() in production)
+  setTimeout(()=>{
+    applyBtnSpan.textContent = originalText;
+    applyBtn.style.opacity = '';
+    applyBtn.style.pointerEvents = '';
+    
+    const result = validateDiscountCode(code);
+    if(result){
+      State.appliedDiscount = result;
+      showToast('Code "' + result.code + '" applied — ' + result.label + '!', ICONS.sparkles);
+      setTimeout(()=>{ closePurchaseModal(); resetChatForNewPurchase(); openChat(); }, 900);
+    } else {
+      State.appliedDiscount = null;
+      showToast('Invalid discount code: "' + code + '"');
+      inputEl.style.borderColor = 'var(--like)';
+      inputEl.style.animation = 'shake 0.4s ease';
+      setTimeout(()=>{ inputEl.style.borderColor = ''; inputEl.style.animation = ''; }, 500);
+    }
+  }, 1000);
+}
+
+/* ===== Chat ===== */
+const chatOverlay = document.getElementById('chatOverlay');
+const chatMessagesEl = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
+const chatSendBtn = document.getElementById('chatSendBtn');
+
+function autoGrowTextarea(){
+  chatInput.style.height = 'auto';
+  const newH = Math.min(chatInput.scrollHeight, 120);
+  chatInput.style.height = newH + 'px';
+  chatSendBtn.disabled = chatInput.value.trim().length === 0 && !State.uploadedImage;
+}
+chatInput.addEventListener('input', autoGrowTextarea);
+
+function openChat(){
+  chatOverlay.classList.add('visible');
+  document.body.style.overflow = 'hidden';
+  
+  if(State.supportFollowUpTimer) clearTimeout(State.supportFollowUpTimer);
+  
+  if(State.chatMessages.length === 0){
+    // Initial message: payment method selection buttons (replaces old welcome)
+    const optionsHtml =
+      '<div class="chat-options">' +
+        buildOptionBtn('binance') +
+        buildOptionBtn('trc20') +
+        buildOptionBtn('bep20') +
+      '</div>';
+    const intro = {
+      txt:'<b>Select a payment method</b> to continue with your subscription:',
+      s:false, tm:nowTime(), extra:optionsHtml
+    };
+    State.chatMessages.push(intro);
+  }
+  
+  renderChatMsgs();
+  attachViewportTracker(chatOverlay);
+  requestAnimationFrame(()=>{
+    chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
+    setTimeout(()=>chatInput.focus({preventScroll:true}), 300);
+  });
+}
+
+/* ===== Payment method helpers ===== */
+function buildOptionBtn(method){
+  const cfg = PAYMENT_CONFIG[method];
+  if(!cfg) return '';
+  return '<button class="chat-option-btn" onclick="selectPaymentMethod(\''+method+'\')">' +
+    '<span class="pay-icon-wrap">'+cfg.iconHtml+'</span>' +
+    '<span class="chat-option-info">' +
+      '<span class="chat-option-title">'+cfg.label+'</span>' +
+      '<span class="chat-option-sub">'+cfg.subtitle+'</span>' +
+    '</span>' +
+    '<span class="chat-option-arrow"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></span>' +
+  '</button>';
+}
+
+function generateCode(len){
+  // Simulates a database-generated verification code.
+  // Replace with a fetch() to your backend in production.
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let s = '';
+  for(let i=0;i<len;i++) s += chars.charAt(Math.floor(Math.random()*chars.length));
+  return 'PAY-' + s;
+}
+
+function selectPaymentMethod(method){
+  const cfg = PAYMENT_CONFIG[method];
+  if(!cfg) return;
+  State.selectedPaymentMethod = method;
+  
+  // Push a user-side acknowledgment that they selected this method
+  const userAck = {txt:'I want to pay with <b>'+cfg.label+'</b>', s:true, tm:nowTime()};
+  State.chatMessages.push(userAck);
+  appendChatMsg(userAck);
+  
+  // After a short delay, push the payment instruction card
+  setTimeout(()=>{
+    const copySvg = '<svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
+    // Determine the plan being purchased (from the plan button the user clicked)
+    const planId = State.selectedPlanForPurchase || State.currentPurchasePlan || State.selectedPlan || 'pro';
+    const planInfo = PLAN_INFO[planId] || {name:planId, price:''};
+    const discount = State.appliedDiscount;
+    
+    // Build the summary rows (Plan + optional Discount) that appear at the top of the card body
+    const summaryRows =
+      '<div class="chat-card-row summary">' +
+        '<span class="chat-card-row-label">Plan</span>' +
+        '<span class="chat-card-row-value">'+escapeHtml(planInfo.name)+' — '+escapeHtml(planInfo.price)+'</span>' +
+      '</div>' +
+      (discount
+        ? '<div class="chat-card-row discount">' +
+            '<span class="chat-card-row-label">Discount</span>' +
+            '<span class="chat-card-row-value">'+escapeHtml(discount.code)+' ('+escapeHtml(discount.label)+')</span>' +
+          '</div>'
+        : '');
+    
+    // The "I've Paid" button (always shown at the bottom of the card).
+    // Pass the method so confirmPayment knows whether to show image upload (TRC20/BEP20) or submit immediately (Binance).
+    const paidBtn =
+      '<button class="chat-card-cta" onclick="confirmPayment(this, \''+method+'\')">' +
+        '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' +
+        '<span>I\'ve Paid</span>' +
+      '</button>';
+    
+    let cardHtml = '';
+    if(method === 'binance'){
+      const code = generateCode(6);
+      cardHtml =
+        '<div class="chat-card">' +
+          '<div class="chat-card-header">' +
+            '<span class="pay-icon-wrap">'+cfg.iconHtml+'</span>' +
+            '<span class="chat-card-title">'+cfg.label+'</span>' +
+          '</div>' +
+          '<div class="chat-card-body">' +
+            summaryRows +
+            '<div class="chat-card-row">' +
+              '<span class="chat-card-row-label">Binance Pay ID</span>' +
+              '<div class="chat-card-row-actions">' +
+                '<span class="chat-card-row-value">'+escapeHtml(cfg.payUser)+'</span>' +
+                '<button class="chat-card-copy" data-copy="'+escapeHtml(cfg.payUser)+'">'+copySvg+'</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="chat-card-row">' +
+              '<span class="chat-card-row-label">Verification Code</span>' +
+              '<div class="chat-card-row-actions">' +
+                '<span class="chat-card-row-value" style="color:var(--accent)">'+code+'</span>' +
+                '<button class="chat-card-copy" data-copy="'+escapeHtml(code)+'">'+copySvg+'</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="chat-card-hint">Send the <b>Verification Code</b> above via Binance Pay to the <b>Binance Pay ID</b> shown on the left, then click <b>I\'ve Paid</b> below.</div>' +
+            paidBtn +
+          '</div>' +
+        '</div>';
+    } else {
+      const network = (method === 'trc20') ? 'TRON (TRC20)' : 'BSC (BEP20)';
+      cardHtml =
+        '<div class="chat-card">' +
+          '<div class="chat-card-header">' +
+            '<span class="pay-icon-wrap">'+cfg.iconHtml+'</span>' +
+            '<span class="chat-card-title">'+cfg.label+'</span>' +
+          '</div>' +
+          '<div class="chat-card-body">' +
+            summaryRows +
+            '<div class="chat-card-row">' +
+              '<span class="chat-card-row-label">Network</span>' +
+              '<span class="chat-card-row-value">'+network+'</span>' +
+            '</div>' +
+            '<div class="chat-card-row">' +
+              '<span class="chat-card-row-label">Wallet</span>' +
+              '<div class="chat-card-row-actions">' +
+                '<span class="chat-card-row-value">'+escapeHtml(cfg.wallet)+'</span>' +
+                '<button class="chat-card-copy" data-copy="'+escapeHtml(cfg.wallet)+'">'+copySvg+'</button>' +
+              '</div>' +
+            '</div>' +
+            '<div class="chat-card-hint">Send your <b>USDT</b> to the wallet address above, then click <b>I\'ve Paid</b> below.</div>' +
+            paidBtn +
+          '</div>' +
+        '</div>';
+    }
+    const cardMsg = {card:cardHtml, s:false, tm:nowTime()};
+    State.chatMessages.push(cardMsg);
+    appendChatMsg(cardMsg);
+  }, 600);
+}
+
+/* ===== Confirm Payment flow =====
+   - Binance Pay: immediate submit (uses code-based verification)
+   - TRC20 / BEP20: show image upload box → user uploads screenshot → click Verify → submit
+*/
+function confirmPayment(btn, method){
+  if(btn.classList.contains('submitted')) return;
+  
+  if(method && method !== 'binance'){
+    // For TRC20/BEP20: show the image upload flow first
+    showPaymentUploadFlow(btn);
+    return;
+  }
+  
+  // For Binance Pay: submit immediately
+  submitPaymentVerification(btn, null, null);
+}
+
+/* Show the image upload box in place of the clicked "I've Paid" button */
+function showPaymentUploadFlow(btn){
+  const container = document.createElement('div');
+  container.className = 'chat-card-upload-flow';
+  container.innerHTML =
+    '<label class="upload-zone">' +
+      '<svg class="upload-icon" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>' +
+      '<div class="upload-text">Upload payment screenshot</div>' +
+      '<div class="upload-sub">Click to choose file</div>' +
+      '<input type="file" accept="image/*" onchange="handlePaymentProof(this)" style="display:none">' +
+    '</label>' +
+    '<div class="upload-preview" style="display:none">' +
+      '<img alt="Payment proof">' +
+      '<button type="button" class="upload-remove" onclick="clearPaymentProof(this)">\u00d7</button>' +
+    '</div>' +
+    '<button type="button" class="chat-card-cta verify-btn" disabled>' +
+      '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>' +
+      '<span>Verify</span>' +
+    '</button>';
+  
+  // Wire up the Verify button via event listener (container is dynamic)
+  const verifyBtn = container.querySelector('.verify-btn');
+  verifyBtn.addEventListener('click', function(){
+    const previewImg = container.querySelector('.upload-preview img');
+    const imgData = previewImg.src;
+    submitPaymentVerification(verifyBtn, imgData, container);
+  });
+  
+  btn.replaceWith(container);
+}
+
+/* Handle file selection from the upload zone */
+function handlePaymentProof(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){
+    showToast('Please select an image file');
+    input.value = '';
+    return;
+  }
+  const container = input.closest('.chat-card-upload-flow');
+  if(!container) return;
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const preview = container.querySelector('.upload-preview');
+    const previewImg = preview.querySelector('img');
+    previewImg.src = e.target.result;
+    preview.style.display = 'block';
+    container.querySelector('.upload-zone').style.display = 'none';
+    container.querySelector('.verify-btn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* Remove the uploaded image and reset the upload zone */
+function clearPaymentProof(removeBtn){
+  const container = removeBtn.closest('.chat-card-upload-flow');
+  if(!container) return;
+  const preview = container.querySelector('.upload-preview');
+  preview.style.display = 'none';
+  preview.querySelector('img').src = '';
+  const input = container.querySelector('input[type=file]');
+  if(input) input.value = '';
+  container.querySelector('.upload-zone').style.display = 'flex';
+  container.querySelector('.verify-btn').disabled = true;
+}
+
+/* Final step: replace button (or upload-flow container) with a Submitted button,
+   then push the proof image (if any) and the verification message. */
+function submitPaymentVerification(btn, imgData, containerToReplace){
+  const submittedBtn = document.createElement('button');
+  submittedBtn.className = 'chat-card-cta submitted';
+  submittedBtn.disabled = true;
+  submittedBtn.innerHTML = '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg><span>Submitted</span>';
+  
+  if(containerToReplace){
+    containerToReplace.replaceWith(submittedBtn);
+  } else if(btn){
+    btn.replaceWith(submittedBtn);
+  }
+  
+  // If a proof image was uploaded (TRC20/BEP20), push it as a user-sent chat message first
+  if(imgData){
+    const proofMsg = {txt:'', img:imgData, s:true, tm:nowTime()};
+    State.chatMessages.push(proofMsg);
+    appendChatMsg(proofMsg);
+  }
+  
+  // Push the bot's verification acknowledgment (single message)
+  const ack = {txt: ICONS.check + ' Got it! <b>Your payment will be verified.</b> We will notify you in this chat once the transaction is confirmed on the blockchain.', s:false, tm:nowTime()};
+  State.chatMessages.push(ack);
+  appendChatMsg(ack);
+}
+
+function copyToClipboard(btn, text){
+  const done = ()=>{ showToast('Copied!', ICONS.check); };
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+    } else {
+      fallbackCopy(text, done);
+    }
+  }catch(e){
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, done){
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    if(done) done();
+  }catch(e){ showToast('Copy failed'); }
+}
+
+// Event delegation for copy buttons (safer than inline onclick with user-provided values)
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.chat-card-copy');
+  if(!btn) return;
+  const text = btn.getAttribute('data-copy');
+  if(text) copyToClipboard(btn, text);
+});
+
+function closeChat(){
+  chatOverlay.classList.remove('visible');
+  chatInput.blur();
+  chatInput.value = '';
+  autoGrowTextarea();
+  document.body.style.overflow = '';
+  detachViewportTracker(chatOverlay);
+  
+  
+  if(State.supportFollowUpTimer){
+    clearTimeout(State.supportFollowUpTimer);
+    State.supportFollowUpTimer = null;
+  }
+}
+
+document.getElementById('chatBack').addEventListener('click', closeChat);
+
+function renderChatMsgs(){
+  let html = '';
+  State.chatMessages.forEach(m=>{
+    let content = '';
+    let extraClass = '';
+    if(m.card){
+      content += m.card;
+      extraClass = ' card';
+    } else {
+      if(m.img) content += '<img src="'+m.img+'" alt="image"/>';
+      if(m.txt) content += '<div>'+m.txt+'</div>';
+      if(m.extra){ content += m.extra; extraClass += ' has-options'; }
+    }
+    html += '<div class="chat-message '+(m.s?'sent':'received')+extraClass+'">'+content+'<div class="chat-message-time">'+m.tm+'</div></div>';
+  });
+  chatMessagesEl.innerHTML = html;
+  requestAnimationFrame(()=>chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight);
+}
+
+function appendChatMsg(m){
+  const div = document.createElement('div');
+  let content = '';
+  let extraClass = '';
+  if(m.card){
+    content += m.card;
+    extraClass = ' card';
+  } else {
+    if(m.img) content += '<img src="'+m.img+'" alt="image"/>';
+    if(m.txt) content += '<div>'+m.txt+'</div>';
+    if(m.extra){ content += m.extra; extraClass += ' has-options'; }
+  }
+  div.className = 'chat-message '+(m.s?'sent':'received')+extraClass;
+  div.innerHTML = content+'<div class="chat-message-time">'+m.tm+'</div>';
+  chatMessagesEl.appendChild(div);
+  requestAnimationFrame(()=>chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight);
+}
+
+function sendMsg(){
+  const txt = chatInput.value.trim();
+  if(!txt && !State.uploadedImage) return;
+  
+  const tm = nowTime();
+  const m = {txt:escapeHtml(txt), s:true, tm:tm, img:State.uploadedImage || null};
+  State.chatMessages.push(m);
+  
+  chatInput.value = '';
+  autoGrowTextarea();
+  if(State.uploadedImage){
+    removeImage();
+  }
+  
+  chatInput.focus({preventScroll:true});
+  appendChatMsg(m);
+  
+  setTimeout(()=>{
+    const replies = [
+      "Thank you! We've received your submission. Our team is verifying your payment now.",
+      "Got it. Once verification is complete, your subscription will be activated.",
+      "Thanks for sending the details. Please allow a few minutes for confirmation.",
+      "Received. We'll process your payment and notify you shortly.",
+      "Thank you for sending the proof. Your subscription will be active once verified.",
+      "Got it! " + ICONS.check + " We're confirming your transaction now.",
+      "Appreciate your patience! We'll get this sorted shortly."
+    ];
+    const reply = replies[Math.floor(Math.random()*replies.length)];
+    const rm = {txt:reply, s:false, tm:nowTime()};
+    State.chatMessages.push(rm);
+    appendChatMsg(rm);
+  }, 1200 + Math.random()*1500);
+}
+
+chatSendBtn.addEventListener('click', function(e){
+  sendMsg();
+  chatInput.focus({preventScroll:true});
+});
+chatSendBtn.addEventListener('mousedown', function(e){e.preventDefault();});
+chatInput.addEventListener('keydown', function(e){
+  if(e.key === 'Enter' && !e.shiftKey){
+    e.preventDefault();
+    sendMsg();
+  }
+});
+
+/* ===== Image Upload ===== */
+function handleImageUpload(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){
+    showToast('Please select an image file');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(e){
+    State.uploadedImage = e.target.result;
+    const preview = document.getElementById('imagePreview');
+    const previewImg = document.getElementById('previewImage');
+    const imageName = document.getElementById('imageName');
+    const imageSize = document.getElementById('imageSize');
+    previewImg.src = e.target.result;
+    imageName.textContent = file.name;
+    imageSize.textContent = formatFileSize(file.size);
+    preview.classList.add('active');
+    autoGrowTextarea();
+  };
+  reader.readAsDataURL(file);
+  event.target.value = '';
+}
+function removeImage(){
+  State.uploadedImage = null;
+  document.getElementById('imagePreview').classList.remove('active');
+  autoGrowTextarea();
+}
+function formatFileSize(bytes){
+  if(bytes < 1024) return bytes + ' B';
+  if(bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+function escapeHtml(text){
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/* ===== Visual Viewport Tracker ===== */
+let _viewportHandler = null;
+let _trackedOverlays = [];
+function attachViewportTracker(overlay){
+  if(_trackedOverlays.indexOf(overlay) === -1) _trackedOverlays.push(overlay);
+  if(_viewportHandler) return;
+  _viewportHandler = ()=>{
+    if(!window.visualViewport) return;
+    const vvH = window.visualViewport.height;
+    const winH = window.innerHeight;
+    const kbH = Math.max(0, winH - vvH);
+    _trackedOverlays.forEach(o=>{
+      if(o && o.classList.contains('visible')){
+        o.style.setProperty('--kb-height', kbH + 'px');
+      }
+    });
+    if(chatOverlay.classList.contains('visible')){
+      requestAnimationFrame(()=>chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight);
+    }
+  };
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', _viewportHandler);
+    window.visualViewport.addEventListener('scroll', _viewportHandler);
+  }
+  window.addEventListener('resize', _viewportHandler);
+  _viewportHandler();
+}
+function detachViewportTracker(overlay){
+  const idx = _trackedOverlays.indexOf(overlay);
+  if(idx !== -1) _trackedOverlays.splice(idx, 1);
+  if(overlay) overlay.style.setProperty('--kb-height', '0px');
+  if(_trackedOverlays.length === 0 && _viewportHandler){
+    if(window.visualViewport){
+      window.visualViewport.removeEventListener('resize', _viewportHandler);
+      window.visualViewport.removeEventListener('scroll', _viewportHandler);
+    }
+    window.removeEventListener('resize', _viewportHandler);
+    _viewportHandler = null;
+  }
+}
+
+/* ===== FAQ ===== */
+function toggleFaq(el){
+  const item = el.parentElement;
+  const answer = item.querySelector('.faq-a');
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>{
+    i.classList.remove('open');
+    i.querySelector('.faq-a').style.maxHeight = '0';
+  });
+  if(!isOpen){
+    item.classList.add('open');
+    answer.style.maxHeight = answer.scrollHeight + 'px';
+  }
+}
+
+/* ===== Escape key ===== */
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape'){
+    if(document.getElementById('purchaseModal').classList.contains('active')){closePurchaseModal(); return;}
+    if(chatOverlay.classList.contains('visible')){closeChat(); return;}
+  }
+});
+
+/* ===== Modal overlay click ===== */
+document.getElementById('purchaseModal').addEventListener('click', function(e){
+  if(e.target === this) closePurchaseModal();
+});
+
+/* ===== Init ===== */
+autoGrowTextarea();
+
+/* ===== Telegram User Data Integration ===== */
+var TgUser = null;
+function initTelegramUser(){
+  var p = new URLSearchParams(location.search);
+  var tgId = p.get('tg_id');
+  if(tgId){
+    TgUser = {
+      id: tgId,
+      name: p.get('tg_name') || 'Trader',
+      firstName: p.get('tg_first') || '',
+      lastName: p.get('tg_last') || '',
+      username: p.get('tg_username') || '',
+      photoUrl: p.get('tg_photo') || '',
+      language: p.get('tg_lang') || 'en',
+      platform: p.get('tg_platform') || 'QUOTEX'
+    };
+    // Store in State for use in purchase flow
+    if(typeof State !== 'undefined'){
+      State.tgUser = TgUser;
+    }
+    // Update any user display elements
+    updateUserDisplay();
+  }
+}
+
+function updateUserDisplay(){
+  if(!TgUser) return;
+  // Update header brand to show user name if element exists
+  var brandEls = document.querySelectorAll('.brand-name, .chat-header-name');
+  // Could add user-specific UI updates here
+}
+
+// Build purchase payload with user data (for sending to backend/bot)
+function buildPurchasePayload(planId, paymentMethod, discountCode){
+  return {
+    user: TgUser || {id:'guest', name:'Guest', username:'guest'},
+    plan: planId,
+    paymentMethod: paymentMethod,
+    discountCode: discountCode || null,
+    timestamp: Date.now(),
+    source: 'quantvexa_wallet'
+  };
+}
+
+initTelegramUser();
+</script>
+</body>
+</html>
