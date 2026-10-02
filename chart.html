@@ -1712,8 +1712,6 @@ function startSignalGenerator(){
 /* ---------- Indicators page ---------- */
 function buildIndicatorsPage(){
   var grid=document.getElementById('indicatorsPageGrid');grid.innerHTML='';
-  var badge=document.getElementById('indicatorsCountBadge');
-  if(badge)badge.textContent=State.indicators.length+' indicators';
   var q=(State.indicatorsSearchQuery||'').trim().toUpperCase();
   var filtered=State.indicators.filter(function(ind){return!q||ind.name.toUpperCase().indexOf(q)!==-1;});
   if(!State.indicators.length){grid.innerHTML='<div class="ind-no-results">No indicators yet. Click Editor → New to create one.</div>';}
