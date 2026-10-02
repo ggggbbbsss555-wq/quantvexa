@@ -265,10 +265,10 @@ html,body{
 <!-- ===== Full-screen iframe container ===== -->
 <div class="page-container" id="pageContainer">
   <div class="frame-loader" id="frameLoader"><div class="spinner"></div></div>
-  <iframe class="page-frame" id="frame-dashboard" data-base="dashboard.html"></iframe>
-  <iframe class="page-frame" id="frame-signals" data-base="signals.html"></iframe>
-  <iframe class="page-frame" id="frame-wallet" data-base="wallet.html"></iframe>
-  <iframe class="page-frame" id="frame-settings" data-base="settings.html"></iframe>
+  <iframe class="page-frame" id="frame-bots" data-base="dashboard.html"></iframe>
+  <iframe class="page-frame" id="frame-chart" data-base="signals.html"></iframe>
+  <iframe class="page-frame" id="frame-plans" data-base="wallet.html"></iframe>
+  <iframe class="page-frame" id="frame-support" data-base="settings.html"></iframe>
 </div>
 
 <!-- Telegram Web App SDK -->
@@ -278,7 +278,7 @@ html,body{
 /* ===== State ===== */
 var State = {
   platform: 'QUOTEX',
-  currentPage: 'dashboard',
+  currentPage: 'bots',
   loadedFrames: {},
   appReady: false,
   tgUser: null
@@ -354,23 +354,23 @@ function getCurrentRoute(){
   var routeParam = params.get('route');
   if(routeParam){
     var page = routeParam.replace(/\//g,'');
-    if(['dashboard','signals','wallet','settings'].indexOf(page) !== -1){
+    if(['bots','chart','plans','support'].indexOf(page) !== -1){
       return page;
     }
   }
   var path = location.pathname;
   var parts = path.split('/').filter(function(p){return p.length > 0;});
   var last = parts[parts.length - 1];
-  if(['dashboard','signals','wallet','settings'].indexOf(last) !== -1){
+  if(['bots','chart','plans','support'].indexOf(last) !== -1){
     return last;
   }
-  return 'dashboard';
+  return 'bots';
 }
 
 /* ===== Logo Intro Sequence ===== */
 (function(){
   var route = getCurrentRoute();
-  if(route !== 'dashboard' || location.search.indexOf('route=') !== -1){
+  if(route !== 'bots' || location.search.indexOf('route=') !== -1){
     document.getElementById('logoScreen').classList.add('hidden');
     State.appReady = true;
     showPage(route);
@@ -403,7 +403,7 @@ function selectPlatform(name){
   setTimeout(function(){
     platformScreen.classList.remove('visible');
     State.appReady = true;
-    showPage('dashboard');
+    showPage('bots');
   }, 500);
 }
 
@@ -442,7 +442,7 @@ function showPage(page){
 /* ===== Handle browser back/forward ===== */
 window.addEventListener('popstate', function(e){
   var page = getCurrentRoute();
-  if(['dashboard','signals','wallet','settings'].indexOf(page) !== -1){
+  if(['bots','chart','plans','support'].indexOf(page) !== -1){
     State.currentPage = page;
     document.querySelectorAll('.page-frame').forEach(function(f){
       f.classList.remove('active');
