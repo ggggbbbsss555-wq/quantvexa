@@ -846,6 +846,7 @@ body{background:var(--bg);color:var(--text)}
   .discount-btn{padding:10px}
 }
 </style>
+<script src="api.js"></script>
 </head>
 <body>
 <div class="app">
@@ -1147,35 +1148,25 @@ const ICONS = {
    To use a real backend, replace `generateCode()` with a fetch() call to your API.
    Brand icons are loaded from official/CDN sources (real SVG logos).
 */
-const PAYMENT_CONFIG = {
-  binance:{
-    label:'Binance Pay',
-    // BNB Coin (Binance Coin) official logo from bnb-chain repo
-    iconHtml:'<img src="https://raw.githubusercontent.com/bnb-chain/wallet-assets/master/assets/BNB/logo.svg" alt="BNB" width="32" height="32" loading="lazy" onerror="this.style.display=\'none\'">',
-    subtitle:'Pay via Binance Pay ID',
-    payUser:'YOUR_BINANCE_PAY_ID'  // ← ضع هنا يوزر Binance Pay الخاص بك
-  },
-  trc20:{
-    label:'USDT TRC20',
-    // TRON network official branded logo
-    iconHtml:'<img src="https://cdn.jsdelivr.net/gh/GMWalletApp/crypto-icons@latest/assets/networks/branded/tron.svg" alt="TRC-20" width="32" height="32" loading="lazy" onerror="this.style.display=\'none\'">',
-    subtitle:'USDT on TRON network',
-    wallet:'TXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'  // ← ضع هنا عنوان TRC20
-  },
-  bep20:{
-    label:'USDT BEP20',
-    // BNB Smart Chain (BEP-20) official branded logo
-    iconHtml:'<img src="https://cdn.jsdelivr.net/gh/GMWalletApp/crypto-icons@latest/assets/networks/branded/binance-smart-chain.svg" alt="BEP-20" width="32" height="32" loading="lazy" onerror="this.style.display=\'none\'">',
-    subtitle:'USDT on BSC network',
-    wallet:'0xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'  // ← ضع هنا عنوان BEP20
-  }
+// Payment config is loaded from the API (admin sets Binance Pay ID etc.)
+let PAYMENT_CONFIG = {
+  binance: { label:'Binance Pay', subtitle:'Pay via Binance Pay ID', payUser:'' },
+  trc20:   { label:'USDT TRC20',  subtitle:'USDT on TRON network',  wallet:'' },
+  bep20:   { label:'USDT BEP20',  subtitle:'USDT on BSC network',   wallet:'' },
 };
 
-/* ===== Plan Info (for auto-display in payment card) ===== */
-const PLAN_INFO = {
+// Plan info is loaded from the API
+let PLAN_INFO = {
   basic: {name:'Basic', price:'$50/mo'},
   pro:   {name:'Pro',   price:'$75/mo'},
   elite: {name:'Elite', price:'$100/mo'}
+};
+
+// Payment icons (base64 inlined)
+const PAYMENT_ICONS = {
+  binance: '<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iOTYiIGhlaWdodD0iOTYiIHZpZXdCb3g9IjAgMCA5NiA5NiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSI0OCIgY3k9IjQ4IiByPSI0OCIgZmlsbD0iIzBCMEUxMSIvPjxwYXRoIGQ9Ik0zNC41MzU1IDQyLjQ2NzZMNDguMDAwMiAyOS4wMDMyTDYxLjQ3MTcgNDIuNDc0N0w2OS4zMDYzIDM0LjYzOTdMNDguMDAwMiAxMy4zMzMzTDI2LjcwMDcgMzQuNjMyOEwzNC41MzU1IDQyLjQ2NzZaTTIxLjE2ODMgNDAuMTY0NkwyOS4wMDMgNDcuOTk5M0wyMS4xNjc5IDU1LjgzNDRMMTMuMzMzMyA0Ny45OTk3TDIxLjE2ODMgNDAuMTY0NlpNMzQuNTM1NSA1My41MzIyTDQ4LjAwMDIgNjYuOTk2Mkw2MS40NzE0IDUzLjUyNTRMNjkuMzEwNSA2MS4zNTYyTDY5LjMwNjMgNjEuMzYwMkw0OC4wMDAyIDgyLjY2NjZMMjYuNzAwNCA2MS4zNjcyTDI2LjY4OTUgNjEuMzU2NEwzNC41MzU1IDUzLjUzMjJaTTgyLjY2NzQgNDguMDAwN0w3NC44MzI3IDU1LjgzNTNMNjYuOTk4MSA0OC4wMDA3TDc0LjgzMjcgNDAuMTY2TDgyLjY2NzQgNDguMDAwN1oiIGZpbGw9IiNGMEI5MEIiLz48L3N2Zz4=" alt="BNB" width="32" height="32">',
+  trc20:   '<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZD0iTTQuNDE5NTggMy4xODU3OUM0LjQ4Nzk1IDMuMTEwMzkgNC41NzU0IDMuMDU0ODMgNC42NzI2OSAzLjAyNDk1QzQuNzY5OTcgMi45OTUwNyA0Ljg3MzUyIDIuOTkxOTYgNC45NzI0MyAzLjAxNTk4TDE2Ljg3NTcgNS45MzAyOEMxNi45NDcyIDUuOTQ2ODkgMTcuMDE0NSA1Ljk3ODI3IDE3LjA3MzIgNi4wMjI0MkwxOS40OTUyIDcuNzg4OUMxOS42MTI5IDcuODc1NjEgMTkuNjkyNCA4LjAwNDQ3IDE5LjcxNzEgOC4xNDg0OEMxOS43NDE5IDguMjkyNTEgMTkuNzEgOC40NDA0NyAxOS42MjgxIDguNTYxNTdMMTEuMjk1OSAyMC43NTMxQzExLjIzNzMgMjAuODM5NSAxMS4xNTU5IDIwLjkwNzggMTEuMDYwOCAyMC45NTA2QzEwLjk2NTUgMjAuOTkzMiAxMC44NjA0IDIxLjAwODggMTAuNzU2OSAyMC45OTUyQzEwLjY1MzQgMjAuOTgxOCAxMC41NTU4IDIwLjkzOTggMTAuNDc0OSAyMC44NzRDMTAuMzkzOSAyMC44MDgzIDEwLjMzMjcgMjAuNzIxMyAxMC4yOTgyIDIwLjYyMjhMNC4zMDYzOCAzLjc1MzExQzQuMjcyNzQgMy42NTcyOSA0LjI2NTQ4IDMuNTU0MTggNC4yODU0MiAzLjQ1NDU5QzQuMzA1MzIgMy4zNTUwMSA0LjM1MTY3IDMuMjYyNjIgNC40MTk1OCAzLjE4NzEiIGZpbGw9IiNFNTAwMjciLz48L3N2Zz4=" alt="TRC-20" width="32" height="32">',
+  bep20:   '<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNNy4wOSA1Ljc1NTAxTDEyIDNMMTYuOTEgNS43NTUwMUwxNS4xMDk5IDYuNzc1MDFMMTIgNS4wMzUwMUw4Ljg5NSA2Ljc3NTAxTDcuMDkgNS43NTUwMVpNMTYuOTEgOS4yMzUwMUwxNS4xMDk5IDguMjE1TDEyIDkuOTU1MDRMOC44OTUgOC4yMTVMNy4wOSA5LjIzNTAxVjExLjI3TDEwLjE5IDEzLjAxVjE2LjQ4NUwxMiAxNy41MDVMMTMuODA1IDE2LjQ4NVYxMy4wMUwxNi45MSAxMS4yN1Y5LjIzNTAxWk0xNi45MSAxNC43NVYxMi43MUwxNS4xMDk5IDEzLjczMDFWMTUuNzY1MUwxNi45MSAxNC43NVpNMTguMTk1IDE1LjQ3TDE1LjA5IDE3LjIwNTFWMTkuMjQ1TDIwLjAwMDEgMTYuNDg1VjEwLjk3NTFMMTguMTk1IDExLjk5MDFWMTUuNDdaTTE2LjM5IDcuNDk1TDE4LjE5IDguNTE1MDFWMTAuNTVMMjAuMDAwMSA5LjUzNTAxVjcuNDk1TDE4LjE5NSA2LjQ3NTAzTDE2LjM5IDcuNTAwMDFWNy40OTVaTTEwLjE5IDE3Ljk0NDlWMTkuOTc5OUwxMiAyMUwxMy44MDUgMTkuOTc5OVYxNy45NUwxMiAxOC45NjVMMTAuMTk1IDE3Ljk0NDlIMTAuMTlaTTcuMDkgMTQuNzQ1TDguODkwMDEgMTUuNzY1MVYxMy43MzAxTDcuMDkgMTIuNzFWMTQuNzVWMTQuNzQ1Wk0xMC4xOSA3LjQ5NUwxMiA4LjUxNTAxTDEzLjgwNSA3LjQ5NUwxMiA2LjQ3NTAzTDEwLjE5NSA3LjUwMDAxTDEwLjE5IDcuNDk1Wk01LjgwNDk5IDguNTE1MDFMNy42MSA3LjQ5NUw1LjgwOTk5IDYuNDc1MDNMNCA3LjUwMDAxVjkuNTQwMDJMNS44MDQ5OSAxMC41NTVWOC41MjAwMVY4LjUxNTAxWk01LjgwNDk5IDExLjk5MDFMNCAxMC45NzUxVjE2LjQ4NUw4LjkxIDE5LjI0NVYxNy4yTDUuODA5OTkgMTUuNDY1VjExLjk4NTFMNS44MDQ5OSAxMS45OTAxWiIgZmlsbD0iI0YwQjkwQiIvPjwvc3ZnPg==" alt="BEP-20" width="32" height="32">',
 };
 
 /* ===== Discount Code Database (simulated) =====
@@ -1187,12 +1178,11 @@ const DISCOUNT_DB = {
   'PRO50':     {percent:50,  label:'50% off'},
   'VIP100':    {percent:100, label:'100% off'}
 };
-function validateDiscountCode(code){
-  // Simulates a database lookup. Returns the discount object or null.
-  // Replace with: fetch('/api/validate-discount?code='+code).then(r=>r.json())
+// Discount validation now goes through the API
+async function validateDiscountCode(code){
   if(!code) return null;
-  const found = DISCOUNT_DB[code.toUpperCase()];
-  return found ? {code:code.toUpperCase(), percent:found.percent, label:found.label} : null;
+  const result = await validateDiscount(code);
+  return result;
 }
 
 /* ===== State ===== */
@@ -1346,7 +1336,7 @@ function buildOptionBtn(method){
   const cfg = PAYMENT_CONFIG[method];
   if(!cfg) return '';
   return '<button class="chat-option-btn" onclick="selectPaymentMethod(\''+method+'\')">' +
-    '<span class="pay-icon-wrap">'+cfg.iconHtml+'</span>' +
+    '<span class="pay-icon-wrap">'+(PAYMENT_ICONS[method]||'')+'</span>' +
     '<span class="chat-option-info">' +
       '<span class="chat-option-title">'+cfg.label+'</span>' +
       '<span class="chat-option-sub">'+cfg.subtitle+'</span>' +
@@ -1409,7 +1399,7 @@ function selectPaymentMethod(method){
       cardHtml =
         '<div class="chat-card">' +
           '<div class="chat-card-header">' +
-            '<span class="pay-icon-wrap">'+cfg.iconHtml+'</span>' +
+            '<span class="pay-icon-wrap">'+(PAYMENT_ICONS[method]||'')+'</span>' +
             '<span class="chat-card-title">'+cfg.label+'</span>' +
           '</div>' +
           '<div class="chat-card-body">' +
@@ -1437,7 +1427,7 @@ function selectPaymentMethod(method){
       cardHtml =
         '<div class="chat-card">' +
           '<div class="chat-card-header">' +
-            '<span class="pay-icon-wrap">'+cfg.iconHtml+'</span>' +
+            '<span class="pay-icon-wrap">'+(PAYMENT_ICONS[method]||'')+'</span>' +
             '<span class="chat-card-title">'+cfg.label+'</span>' +
           '</div>' +
           '<div class="chat-card-body">' +
@@ -1569,8 +1559,23 @@ function submitPaymentVerification(btn, imgData, containerToReplace){
     appendChatMsg(proofMsg);
   }
   
-  // Push the bot's verification acknowledgment (single message)
-  const ack = {txt: ICONS.check + ' Got it! <b>Your payment will be verified.</b> We will notify you in this chat once the transaction is confirmed on the blockchain.', s:false, tm:nowTime()};
+  // Submit to the API — the backend generates the verification code for Binance
+  const planId = State.selectedPlanForPurchase || State.currentPurchasePlan || State.selectedPlan || 'pro';
+  const method = State.selectedPaymentMethod || 'binance';
+  const txId = method === 'binance' ? (window._verificationCode || 'PAY-' + Date.now().toString(36).toUpperCase()) : ('TX' + Date.now().toString(36).toUpperCase());
+  
+  // Send the subscription request to the API
+  createSubRequest(planId, method, txId, imgData || null, '').then(result => {
+    if (result && result.verificationCode) {
+      // Show the verification code to the user (for Binance Pay)
+      const codeMsg = {txt: 'Your verification code: <b>' + result.verificationCode + '</b> — send this via Binance Pay.', s:false, tm:nowTime()};
+      State.chatMessages.push(codeMsg);
+      appendChatMsg(codeMsg);
+    }
+  });
+  
+  // Push the bot's verification acknowledgment
+  const ack = {txt: ICONS.check + ' Got it! <b>Your payment will be verified.</b> We will notify you in this chat once the transaction is confirmed.', s:false, tm:nowTime()};
   State.chatMessages.push(ack);
   appendChatMsg(ack);
 }
@@ -1866,6 +1871,29 @@ function buildPurchasePayload(planId, paymentMethod, discountCode){
 }
 
 initTelegramUser();
+
+// === API Init — load payment config + plans from backend ===
+(async function() {
+  await initAPI();
+  // Load payment methods from API (admin sets Binance Pay ID etc.)
+  const payments = await getPaymentMethods();
+  if (payments) {
+    for (const [id, cfg] of Object.entries(payments)) {
+      if (PAYMENT_CONFIG[id]) {
+        Object.assign(PAYMENT_CONFIG[id], cfg);
+      }
+    }
+  }
+  // Load plans from API
+  const plans = await getPlans();
+  if (plans && plans.length) {
+    plans.forEach(p => {
+      if (PLAN_INFO[p.id]) {
+        PLAN_INFO[p.id] = { name: p.name, price: '$' + p.price + '/mo' };
+      }
+    });
+  }
+})();
 </script>
 </body>
 </html>

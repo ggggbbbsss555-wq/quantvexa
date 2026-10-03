@@ -738,6 +738,7 @@ html,body{width:100%;height:100%;background:#000;display:flex;justify-content:ce
 }
 .platform-modal-close:hover{border-color:#333;color:#fff}
 </style>
+<script src="api.js"></script>
 </head>
 <body>
 <div class="chart-container" id="chartContainer">
@@ -2772,6 +2773,8 @@ navigateTo=function(page,opts){
 };
 
 initTelegramUser();
+// API init
+initAPI();
 
 /* ===== Platform Selector Modal ===== */
 function openPlatformModal(){
