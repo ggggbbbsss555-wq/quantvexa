@@ -2030,7 +2030,7 @@ html,body{
     <div class="platform-modal-options">
       <button class="platform-modal-option" data-platform="QUOTEX" onclick="changePlatform('QUOTEX')">
         <div class="platform-modal-option-icon">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcFvxyyOav4JkmfHjin4QVvyrHjr4iCDxe_frab1fMjjVs1LhfvPS78MU&s=10" alt="QUOTEX" style="width:26px;height:26px;border-radius:6px;object-fit:cover"/>
+          <img src="https://quotex.io/assets/images/logo.svg" alt="QUOTEX" style="width:26px;height:26px;border-radius:6px;object-fit:cover"/>
         </div>
         <div class="platform-modal-option-info">
           <div class="platform-modal-option-name">QUOTEX</div>
@@ -2059,120 +2059,11 @@ html,body{
 
 <script>
 /* ===== Strategy Definitions ===== */
-const STRATEGIES = {
-  strong: {
-    name: 'Strong',
-    tag: 'High frequency, moderate accuracy',
-    color: '#00ff88',
-    hint: 'Strong mode selected — generates frequent signals',
-    winRate: 0.55,
-    profitRange: [0.3, 1.8],
-    lossRange: [0.4, 1.6],
-    icon: '<svg viewBox="0 0 24 24"><line x1="6" y1="3" x2="6" y2="21"/><rect x="4" y="7" width="4" height="8" fill="currentColor" fill-opacity="0.2"/><line x1="13" y1="5" x2="13" y2="19"/><rect x="11" y="9" width="4" height="6" fill="currentColor" fill-opacity="0.2"/><line x1="19" y1="4" x2="19" y2="20"/><rect x="17" y="8" width="4" height="7" fill="currentColor" fill-opacity="0.2"/></svg>',
-    stats: [
-      {value: '15-25', label: 'Signals/day'},
-      {value: '70%', label: 'Accuracy'},
-      {value: '1-3m', label: 'Duration'}
-    ],
-    features: [
-      {text: 'Generates up to <strong>25 signals per day</strong> to capture maximum market opportunities'},
-      {text: 'Real-time scanning across <strong>multiple timeframes</strong> simultaneously for faster entries'},
-      {text: 'Instant alerts when a signal is confirmed, with <strong>precise entry point</strong> detection'},
-      {text: 'Supports all major assets: currencies, crypto, commodities, and indices'},
-      {text: '<strong>70% accuracy</strong> rate with preliminary filtering to discard weak signals'},
-      {text: 'Best suited for <strong>active traders</strong> who prefer high-volume trading sessions'}
-    ]
-  },
-  medium: {
-    name: 'Medium',
-    tag: 'Balanced signals, steady results',
-    color: '#00d2ff',
-    hint: 'Medium mode selected — balanced signals and results',
-    winRate: 0.65,
-    profitRange: [0.3, 2.0],
-    lossRange: [0.3, 1.5],
-    icon: '<svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><polyline points="3 6 9 12 13 8 21 14"/><circle cx="13" cy="8" r="1.5" fill="currentColor"/></svg>',
-    stats: [
-      {value: '8-12', label: 'Signals/day'},
-      {value: '80%', label: 'Accuracy'},
-      {value: '2-5m', label: 'Duration'}
-    ],
-    features: [
-      {text: '<strong>Perfect balance</strong> between signal volume and quality for steady, consistent results'},
-      {text: 'Multi-timeframe analysis to <strong>confirm trend direction</strong> before sending any signal'},
-      {text: 'Advanced filtering system automatically excludes <strong>low-quality setups</strong>'},
-      {text: 'Up to <strong>80% accuracy</strong> with built-in risk management rules'},
-      {text: 'Suitable for all levels — from <strong>beginners to advanced traders</strong>'},
-      {text: 'Signals distributed throughout the day with <strong>smart timing</strong> for optimal sessions'}
-    ]
-  },
-  pro: {
-    name: 'Pro',
-    tag: 'Premium accuracy, low frequency',
-    color: '#ab82ff',
-    hint: 'Pro mode selected — premium accuracy, low frequency',
-    winRate: 0.78,
-    profitRange: [0.5, 2.5],
-    lossRange: [0.3, 1.2],
-    icon: '<svg viewBox="0 0 24 24"><polygon points="12 2 22 12 12 22 2 12"/><polyline points="7 12 10 9 14 13 17 10"/></svg>',
-    stats: [
-      {value: '3-5', label: 'Signals/day'},
-      {value: '92%', label: 'Accuracy'},
-      {value: '5-15m', label: 'Duration'}
-    ],
-    features: [
-      {text: 'Hand-picked signals limited to <strong>5 per day</strong> at the highest quality tier'},
-      {text: 'Exceptional <strong>92% accuracy</strong> rate with multi-source confirmation'},
-      {text: 'Deep analysis powered by <strong>AI algorithms</strong> and machine-learning models'},
-      {text: 'Every signal confirmed across <strong>multiple technical indicators</strong> before delivery'},
-      {text: 'Includes news and economic event impact analysis for smarter entries'},
-      {text: 'Built for <strong>professional traders</strong> who prioritize quality over quantity'}
-    ]
-  }
-};
-
-/* ===== State ===== */
-const State = {
-  currentPage: 'home',
-  currentFilter: 'all',
-  strategy: 'strong',
-  platform: 'QUOTEX',
-  isRunning: false,
-  sessionTimer: null,
-  nextSignalTimer: null,
-  sessionStartTime: null,
-  sessionTime: '09:00',
-  signalsCount: 10,
-  signalsSent: 0,
-  credits: 900,
-  costPerSignal: 1,
-  dailyLimit: 50,
-  chatId: '',
-  trades: []
-};
-
-/* ===== Cost per signal for each bot type ===== */
-const BOT_COST = {
-  strong: 1,
-  medium: 3,
-  pro: 6
-};
-
-const TOTAL_CREDITS = 900; // initial monthly grant
-
-/* ===== Sample Trades ===== */
-const SAMPLE_TRADES = [
-  {id:1,symbol:'BTC/USDT',short:'BTC',type:'buy',entry:67234.50,exit:67890.20,duration:120,time:'14:32',result:'win',profit:0.98},
-  {id:2,symbol:'ETH/USDT',short:'ETH',type:'buy',entry:3456.20,exit:3512.80,duration:180,time:'14:15',result:'win',profit:1.63},
-  {id:3,symbol:'SOL/USDT',short:'SOL',type:'sell',entry:178.50,exit:176.20,duration:90,time:'13:48',result:'win',profit:1.29},
-  {id:4,symbol:'XRP/USDT',short:'XRP',type:'buy',entry:0.5432,exit:0.5398,duration:240,time:'13:20',result:'loss',profit:-0.63},
-  {id:5,symbol:'AVAX/USDT',short:'AVAX',type:'buy',entry:38.76,exit:39.45,duration:60,time:'12:55',result:'win',profit:1.78},
-  {id:6,symbol:'DOGE/USDT',short:'DOGE',type:'sell',entry:0.1654,exit:0.1689,duration:150,time:'12:30',result:'loss',profit:-2.12},
-  {id:7,symbol:'LINK/USDT',short:'LINK',type:'buy',entry:14.56,exit:0,duration:120,time:'12:05',result:'pending',profit:0},
-  {id:8,symbol:'ADA/USDT',short:'ADA',type:'sell',entry:0.4521,exit:0,duration:90,time:'11:40',result:'pending',profit:0}
-];
-
-State.trades = SAMPLE_TRADES;
+// Strategies, bot cost, credits, and trades are loaded from the API
+let STRATEGIES = {};
+let BOT_COST = { strong: 1, medium: 3, pro: 6 };
+const TOTAL_CREDITS = 900;
+State.trades = [];
 
 /* ===== Utilities ===== */
 function formatPrice(p){

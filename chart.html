@@ -770,7 +770,7 @@ html,body{width:100%;height:100%;background:#000;display:flex;justify-content:ce
     <div class="platform-modal-options">
       <button class="platform-modal-option" data-platform="QUOTEX" onclick="changePlatform('QUOTEX')">
         <div class="platform-modal-option-icon">
-          <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcFvxyyOav4JkmfHjin4QVvyrHjr4iCDxe_frab1fMjjVs1LhfvPS78MU&s=10" alt="QUOTEX" style="width:26px;height:26px;border-radius:6px;object-fit:cover"/>
+          <img src="https://quotex.io/assets/images/logo.svg" alt="QUOTEX" style="width:26px;height:26px;border-radius:6px;object-fit:cover"/>
         </div>
         <div class="platform-modal-option-info">
           <div class="platform-modal-option-name">QUOTEX</div>
@@ -1618,14 +1618,7 @@ document.addEventListener('keydown',function(e){
 
 /* ---------- Signals (legacy data, signals page removed) ---------- */
 var nowSec=Math.floor(Date.now()/1000);
-var SIGNALS_DATA=[
-  {id:1,symbol:'EURUSD-OTC',type:'buy',entry:1.0852,duration:120,startTime:nowSec-30,result:null,profit:null,isNew:false},
-  {id:2,symbol:'GBPUSD-OTC',type:'buy',entry:1.3025,duration:180,startTime:nowSec-90,result:null,profit:null,isNew:false},
-  {id:3,symbol:'USDJPY-OTC',type:'sell',entry:149.85,duration:90,startTime:nowSec-60,result:null,profit:null,isNew:false},
-  {id:4,symbol:'AUDUSD-OTC',type:'buy',entry:0.6582,duration:240,startTime:nowSec-10,result:null,profit:null,isNew:true},
-  {id:5,symbol:'USDCAD-OTC',type:'buy',entry:1.3585,duration:60,startTime:nowSec-45,result:null,profit:null,isNew:true},
-  {id:6,symbol:'EURJPY-OTC',type:'sell',entry:163.45,duration:150,startTime:nowSec-120,result:null,profit:null,isNew:false}
-];
+var SIGNALS_DATA=[]; // Loaded from API
 var TR=36,TC=2*Math.PI*TR,sUI=null;
 function getSR(s){return Math.max(0,s.duration-(Math.floor(Date.now()/1000)-s.startTime));}
 function resolveSignal(s){if(s.result!==null)return;s.result=Math.random()<0.65?'win':'lose';var bp=Math.random()*1.5+0.3;s.profit=s.result==='win'?bp:-(bp*0.6);playTradeSound();}
